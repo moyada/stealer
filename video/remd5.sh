@@ -1,10 +1,17 @@
 #!/bin/sh
 
-workdir=$(cd $(dirname $0); pwd)
-file=$workdir'/'$1
+
+f=${1:0:1}
+
+if [ "$f" = "/" ]; then
+  file=$1
+else
+  workdir=$(cd $(dirname $0); pwd)
+  file=$workdir'/'$1
+fi
 
 if [ ! -f "$file" ]; then
- echo 'error: file not exist!'
+ echo 'error: '$file' file not exist!'
  exit
 fi
 
