@@ -1,5 +1,5 @@
-import re
 
+import re
 from django.http import HttpResponse, HttpResponseServerError
 
 from stealer.interface import Service
@@ -16,15 +16,14 @@ download_headers = {
     "accept-encoding": "identity;q=1, *;q=0",
     "accept-language": "zh-CN,zh;q=0.9,ja;q=0.8,en;q=0.7,zh-TW;q=0.6,de;q=0.5,fr;q=0.4,ca;q=0.3,ga;q=0.2",
     "range": "bytes=0-",
-    "referer": "https://www.iesdouyin.com/share/video/6810212113966025991/?region=CN&mid=6806868603829225474&u_code=4bbc2hgjj56e&titleType=title&utm_source=copy_link&utm_campaign=client_share&utm_medium=android&app=aweme",
     "sec-fetch-dest": "video",
     "sec-fetch-mode": "no-cors",
     "sec-fetch-site": "cross-sit",
-    "user-agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.3 Mobile/15E148 Safari/604.1"
+    "user-agent": config.user_agent
 }
 
 
-class _KuaishouService(Service):
+class _DouyinService(Service):
 
     def fetch(self, url: str, model=0) -> Result:
         """
@@ -103,4 +102,4 @@ class _KuaishouService(Service):
         return self.stream(file, index)
 
 
-INSTANCE = _KuaishouService()
+INSTANCE = _DouyinService()

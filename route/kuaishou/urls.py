@@ -1,6 +1,6 @@
 from django.urls import path
 
-from . import views
+from route.douyin import views
 
 urlpatterns = [
     path('fetch', views.fetch, name='fetch'),

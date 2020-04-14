@@ -2,15 +2,15 @@
 from django.http import *
 
 # Create your views here.
-import douyin.service
-import kuaishou.service
+import app.douyin
+import app.kuaishou
 from stealer.interface import Service
 from tools.type import Video
 
 
 routes = {
-    Video.DOUYIN: douyin.service.INSTANCE,
-    Video.KUAISHOU: kuaishou.service.INSTANCE,
+    Video.DOUYIN: app.douyin.INSTANCE,
+    Video.KUAISHOU: app.kuaishou.INSTANCE,
 }
 
 
