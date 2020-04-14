@@ -5,10 +5,16 @@ from stealer.model import Result
 
 class Service:
 
-    def fetch(self, url: str, model=0) -> Result:
+    @classmethod
+    def index(cls, url) -> str:
         pass
 
-    def download(self, url: str) -> HttpResponse:
+    @classmethod
+    def fetch(cls, url: str, model=0) -> Result:
+        pass
+
+    @classmethod
+    def download(cls, url: str) -> HttpResponse:
         pass
 
     @staticmethod

@@ -1,3 +1,4 @@
+from typing import Type
 
 from django.http import *
 
@@ -9,13 +10,16 @@ from tools.type import Video
 
 
 routes = {
-    Video.DOUYIN: app.douyin.INSTANCE,
-    Video.KUAISHOU: app.kuaishou.INSTANCE,
+    Video.DOUYIN: app.douyin.DouyinService,
+    Video.KUAISHOU: app.kuaishou.KuaishouService,
 }
 
 
-def get_service(vtype: Video) -> Service:
-    return routes.get(vtype)
+def get_service(vtype: Video) -> Type[Service]:
+    service = routes.get(vtype)
+    if service is None:
+        raise ModuleNotFoundError(vtype.name)
+    return service
 
 
 def fetch(vtype: Video, request):

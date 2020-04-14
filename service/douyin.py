@@ -23,9 +23,15 @@ download_headers = {
 }
 
 
-class _DouyinService(Service):
+class DouyinService(Service):
 
-    def fetch(self, url: str, model=0) -> Result:
+    @classmethod
+    def index(cls, url) -> str:
+        index = re.findall(r'(?<=com\/)\w+', url)
+        return index[0]
+
+    @classmethod
+    def fetch(cls, url: str, model=0) -> Result:
         """
         获取视频详情
         :param url:
@@ -68,23 +74,20 @@ class _DouyinService(Service):
             result.ref = res.url
         return result
 
-    def get_index(self, url) -> str:
-        index = re.findall(r'(?<=com\/)\w+', url)
-        return index[0]
-
-    def download(self, url) -> HttpResponse:
+    @classmethod
+    def download(cls, url) -> HttpResponse:
         """
         下载视频
         :param url:
         :return:
         """
         # 检查文件
-        index = self.get_index(url)
+        index = cls.index(url)
         file = store.find(Video.DOUYIN, index)
         if file is not None:
-            return self.stream(file, index)
+            return Service.stream(file, index)
 
-        result = self.fetch(url, model=1)
+        result = cls.fetch(url, model=1)
         if not result.is_success():
             return HttpResponseServerError(result.get_data())
 
@@ -99,7 +102,4 @@ class _DouyinService(Service):
         res.close()
 
         file = store.find(Video.DOUYIN, index)
-        return self.stream(file, index)
-
-
-INSTANCE = _DouyinService()
+        return Service.stream(file, index)
