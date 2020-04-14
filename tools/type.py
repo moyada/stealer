@@ -5,3 +5,4 @@ from enum import Enum, unique
 class Video(Enum):
     DOUYIN = 'douyin'
     TIKTOK = 'tiktok'
+    KUAISHOU = 'kuaishou'

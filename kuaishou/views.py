@@ -4,8 +4,8 @@ from tools.type import Video
 
 
 def fetch(request):
-    return route.fetch(Video.DOUYIN, request)
+    return route.fetch(Video.KUAISHOU, request)
 
 
 def download(request):
-    return route.download(Video.DOUYIN, request)
+    return route.download(Video.KUAISHOU, request)
