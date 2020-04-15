@@ -37,9 +37,9 @@ class Result:
 @unique
 class ErrorResult(Result, Enum):
     URL_NOT_FOUNT = False, 'url not found.'
+    VIDEO_ADDRESS_NOT_FOUNT = False, 'video address not found.'
 
     def __init__(self, *value):
-        print(value)
         super().__init__(success=value[0], data=value[1])  # init Song
         # super(Enum, self).__init__()
 

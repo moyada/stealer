@@ -1,8 +1,8 @@
 from django.urls import path
 
-from route.douyin import views
+from route.kuaishou import views
 
 urlpatterns = [
-    path('fetch', views.fetch, name='fetch'),
-    path('download', views.download, name='download'),
+    path('fetch.html', views.fetch, name='fetch'),
+    path('download.html', views.download, name='download'),
 ]

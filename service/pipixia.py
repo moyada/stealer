@@ -1,4 +1,4 @@
-
+import json
 import re
 from django.http import HttpResponse, HttpResponseServerError
 
@@ -8,13 +8,23 @@ from tools import store, analyzer, http_utils, config
 from tools.type import Video
 
 headers = {
+    "accept": "*/*",
+    "accept-encoding": "gzip, deflate",
+    "user-agent": config.user_agent
+}
+
+share_headers = {
+    "accept": "*/*",
+    "accept-encoding": "gzip, deflate",
+    "sec-fetch-dest": "empty",
+    "sec-fetch-mode": "cors",
+    "sec-fetch-site": "same-origin",
     "user-agent": config.user_agent
 }
 
 download_headers = {
     "accept": "*/*",
     "accept-encoding": "identity;q=1, *;q=0",
-    "accept-language": "zh-CN,zh;q=0.9,ja;q=0.8,en;q=0.7,zh-TW;q=0.6,de;q=0.5,fr;q=0.4,ca;q=0.3,ga;q=0.2",
     "range": "bytes=0-",
     "sec-fetch-dest": "video",
     "sec-fetch-mode": "no-cors",
@@ -22,14 +32,14 @@ download_headers = {
     "user-agent": config.user_agent
 }
 
-vtype = Video.DOUYIN
+vtype = Video.PIPIXIA
 
 
-class DouyinService(Service):
+class PipixiaService(Service):
 
     @classmethod
     def index(cls, url) -> str:
-        index = re.findall(r'(?<=com\/)\w+', url)
+        index = re.findall(r'(?<=s\/)\w+', url)
         return index[0]
 
     @classmethod
@@ -44,37 +54,25 @@ class DouyinService(Service):
         if url is None:
             return ErrorResult.URL_NOT_FOUNT
 
-        # 请求短链接，获得itemId和dytk
         res = http_utils.get(url, header=headers)
         if http_utils.is_error(res):
             return Result.error(res)
 
-        html = str(res.content)
-        item_id = re.findall(r"(?<=itemId:\s\")\d+", html)[0]
-        dytk = re.findall(r"(?<=dytk:\s\")(.*?)(?=\")", html)[0]
+        id = re.findall(r"(?<=item\/)(\d+)(?=\?)", res.url)[0]
+        url = "https://h5.pipix.com/bds/webapi/item/detail/?item_id=" + id + "&source=share"
 
-        # 组装视频长链接
-        infourl = "https://www.iesdouyin.com/web/api/v2/aweme/iteminfo/?item_ids=" + item_id + "&dytk=" + dytk
+        info_res = http_utils.get(url, header=share_headers)
+        if http_utils.is_error(info_res):
+            return Result.error(info_res)
 
-        # 请求长链接，获取play_addr
-        url_res = http_utils.get(infourl, header=headers)
-        if http_utils.is_error(url_res):
-            return Result.error(url_res)
+        data = json.loads(str(info_res.text))
 
-        vhtml = str(url_res.text)
-        uri = re.findall(r'(?<=\"uri\":\")\w{32}(?=\")', vhtml)[0]
-
-        if not uri:
+        try:
+            url = data['data']['item']['origin_video_download']['url_list'][0]['url']
+        except KeyError:
             return ErrorResult.VIDEO_ADDRESS_NOT_FOUNT
 
-        link = "https://aweme.snssdk.com/aweme/v1/play/?video_id=" + uri + \
-                "&line=0&ratio=540p&media_type=4&vr_type=0&improve_bitrate=0" \
-                "&is_play_url=1&is_support_h265=0&source=PackSourceEnum_PUBLISH"
-        result = Result.success(link)
-
-        if model != 0:
-            result.ref = res.url
-        return result
+        return Result.success(url)
 
     @classmethod
     def download(cls, url) -> HttpResponse:
@@ -89,14 +87,11 @@ class DouyinService(Service):
         if file is not None:
             return Service.stream(file, index)
 
-        result = cls.fetch(url, model=1)
+        result = cls.fetch(url)
         if not result.is_success():
             return HttpResponseServerError(result.get_data())
 
-        dheaders = download_headers.copy()
-        dheaders['referer'] = result.ref
-
-        res = http_utils.get(url=result.get_data(), header=dheaders)
+        res = http_utils.get(url=result.get_data(), header=download_headers)
         if http_utils.is_error(res):
             return HttpResponseServerError(str(res))
 
@@ -108,4 +103,4 @@ class DouyinService(Service):
 
 
 if __name__ == '__main__':
-    DouyinService.fetch('https://v.douyin.com/cCBrrq/')
+    PipixiaService.fetch('http://h5.pipix.com/s/3asShh')

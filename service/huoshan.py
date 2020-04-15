@@ -11,6 +11,15 @@ headers = {
     "user-agent": config.user_agent
 }
 
+info_headers = {
+    "accept": "*/*",
+    "accept-encoding": "gzip, deflate",
+    "sec-fetch-dest": "empty",
+    "sec-fetch-mode": "cors",
+    "sec-fetch-site": "same-origin",
+    "user-agent": config.user_agent
+}
+
 download_headers = {
     "accept": "*/*",
     "accept-encoding": "identity;q=1, *;q=0",
@@ -22,14 +31,14 @@ download_headers = {
     "user-agent": config.user_agent
 }
 
-vtype = Video.DOUYIN
+vtype = Video.HUOSHAN
 
 
-class DouyinService(Service):
+class HuoshanService(Service):
 
     @classmethod
     def index(cls, url) -> str:
-        index = re.findall(r'(?<=com\/)\w+', url)
+        index = re.findall(r'(?<=s\/)\w+', url)
         return index[0]
 
     @classmethod
@@ -44,32 +53,28 @@ class DouyinService(Service):
         if url is None:
             return ErrorResult.URL_NOT_FOUNT
 
-        # 请求短链接，获得itemId和dytk
+        # 请求短链接，获得itemId
         res = http_utils.get(url, header=headers)
         if http_utils.is_error(res):
             return Result.error(res)
 
-        html = str(res.content)
-        item_id = re.findall(r"(?<=itemId:\s\")\d+", html)[0]
-        dytk = re.findall(r"(?<=dytk:\s\")(.*?)(?=\")", html)[0]
+        item_id = re.findall(r"(?<=item_id=)\d+(?=\&)", res.url)[0]
 
-        # 组装视频长链接
-        infourl = "https://www.iesdouyin.com/web/api/v2/aweme/iteminfo/?item_ids=" + item_id + "&dytk=" + dytk
+        # 视频信息链接
+        infourl = "https://share.huoshan.com/api/item/info?item_id=" + item_id
 
         # 请求长链接，获取play_addr
-        url_res = http_utils.get(infourl, header=headers)
+        url_res = http_utils.get(infourl, header=info_headers)
         if http_utils.is_error(url_res):
             return Result.error(url_res)
 
         vhtml = str(url_res.text)
-        uri = re.findall(r'(?<=\"uri\":\")\w{32}(?=\")', vhtml)[0]
+        video_id = re.findall(r'(?<=video_id\=)\w+(?=\&)', vhtml)[0]
 
-        if not uri:
+        if not video_id:
             return ErrorResult.VIDEO_ADDRESS_NOT_FOUNT
 
-        link = "https://aweme.snssdk.com/aweme/v1/play/?video_id=" + uri + \
-                "&line=0&ratio=540p&media_type=4&vr_type=0&improve_bitrate=0" \
-                "&is_play_url=1&is_support_h265=0&source=PackSourceEnum_PUBLISH"
+        link = "https://api.huoshan.com/hotsoon/item/video/_source/?video_id=" + video_id + "&line=0&app_id=0&vquality=normal"
         result = Result.success(link)
 
         if model != 0:
@@ -108,4 +113,4 @@ class DouyinService(Service):
 
 
 if __name__ == '__main__':
-    DouyinService.fetch('https://v.douyin.com/cCBrrq/')
+    HuoshanService.fetch('http://share.huoshan.com/hotsoon/s/eVDEDNYXu78')

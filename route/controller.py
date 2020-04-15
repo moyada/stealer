@@ -1,24 +1,27 @@
-from typing import Type
+from typing \
+    import Type
 
 from django.http import *
 
 # Create your views here.
-import app.douyin
-import app.kuaishou
+from service import *
 from stealer.interface import Service
 from tools.type import Video
 
 
 routes = {
-    Video.DOUYIN: app.douyin.DouyinService,
-    Video.KUAISHOU: app.kuaishou.KuaishouService,
+    Video.DOUYIN: douyin.DouyinService,
+    Video.KUAISHOU: kuaishou.KuaishouService,
+    Video.HUOSHAN: huoshan.HuoshanService,
+    Video.XIGUA: xigua.XiguaService,
+    Video.PIPIXIA: pipixia.PipixiaService,
 }
 
 
 def get_service(vtype: Video) -> Type[Service]:
     service = routes.get(vtype)
     if service is None:
-        raise ModuleNotFoundError(vtype.name)
+        raise ModuleNotFoundError('Not match route, Video type ' + vtype.name)
     return service
 
 

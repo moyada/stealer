@@ -16,9 +16,15 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
+from service import index
+
 urlpatterns = [
     # path('admin/', admin.site.urls),
-    # path('ip/', admin.site.urls),
+    path('', index.index, name='index'),
+    path('ip/', index.ip, name='ip'),
     path('douyin/', include('route.douyin.urls')),
     path('kuaishou/', include('route.kuaishou.urls')),
+    path('huoshan/', include('route.huoshan.urls')),
+    path('pipixia/', include('route.pipixia.urls')),
+    # path('xigua/', include('route.xigua.urls')),
 ]
