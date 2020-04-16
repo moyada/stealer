@@ -1,3 +1,3 @@
 #!/bin/sh
 
-kill `cat stealler.pid`
+kill `cat stealer.pid`
