@@ -2,7 +2,7 @@ import os
 
 from requests import Response
 
-from tools import terminal
+from tools import terminal, system
 from core.type import Video
 
 base_path = os.getcwd() + "/video/"
@@ -27,4 +27,9 @@ def save(vtype: Video, res: Response, index: str):
     with open(filename, 'wb')as file:
         file.write(res.content)
         file.close()
-    print(terminal.run_cmd('sh video/remd5.sh ' + filename))
+
+    if system.is_mac():
+        command = 'md5'
+    else:
+        command = 'md5sum'
+    print(terminal.run_cmd('sh video/remd5.sh {} {}'.format(command, filename)))

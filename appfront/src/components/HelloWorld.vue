@@ -13,8 +13,8 @@
 <!--          <span style="font-size: large">{{ item.label }}</span>-->
         </el-option>
       </el-select>
-      <el-button @click="fetch()" style="margin: 2px;">分析</el-button>
-      <el-button @click="download()" type="primary" plain style="margin: 2px;">下载</el-button>
+      <el-button v-loading="loading" @click="fetch()" style="margin: 2px;">分析</el-button>
+      <el-button v-loading="loading" @click="download()" type="primary" plain style="margin: 2px;">下载</el-button>
     </el-row>
 
     <div v-if="downloadAddr !== ''" style="margin-top: 10px; padding-left: 20%; padding-right: 20%;">
@@ -32,6 +32,7 @@
     delimiters: ['[[', ']]'],
     data () {
       return {
+        loading: false,
         inputUrl: '',
         selectedType: '',
         options: [],

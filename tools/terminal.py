@@ -73,4 +73,4 @@ def run_cmd(cmd, timeout=None):
 
 
 if __name__ == '__main__':
-    print(run_cmd('sh ../video/remd5.sh /video/666.txt'))
+    print(run_cmd('sh ../video/remd5.sh {} {}'.format('md5', '../video/douyin/3Wok63.mp4')))

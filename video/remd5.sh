@@ -1,13 +1,14 @@
 #!/bin/sh
 
-
-f=${1:0:1}
+command=$1
+#截取第一位字符
+f=${2:0:1}
 
 if [ "$f" = "/" ]; then
-  file=$1
+  file=$2
 else
   workdir=$(cd $(dirname $0); pwd)
-  file=$workdir'/'$1
+  file=$workdir'/'$2
 fi
 
 if [ ! -f "$file" ]; then
@@ -15,7 +16,7 @@ if [ ! -f "$file" ]; then
  exit
 fi
 
-echo 'old md5 >>>' $(md5 -q $file)
+echo 'old md5 >>>' $($command -q $file)
 
 echo 0 >> $file
-echo 'new md5 >>>' $(md5 -q $file)
+echo 'new md5 >>>' $($command -q $file)
