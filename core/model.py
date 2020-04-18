@@ -40,8 +40,8 @@ class ErrorResult(Result, Enum):
     URL_NOT_PRESENT = False, 'url is not present.'
     TYPE_NOT_PRESENT = False, 'type is not present.'
     MAPPER_NOT_EXIST = False, 'type mapper not exist.'
-    URL_NOT_INCORRECT = False, 'url is incorrect.'
-    VIDEO_ADDRESS_NOT_FOUNT = False, 'video address not found.'
+    URL_NOT_INCORRECT = False, '分享地址有误.'
+    VIDEO_ADDRESS_NOT_FOUNT = False, '视频地址获取失败.'
 
     def __init__(self, *value):
         super().__init__(success=value[0], data=value[1])  # init Song

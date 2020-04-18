@@ -51,7 +51,7 @@ Vue.mixin({
            * is an instance of XMLHttpRequest in the browser and an instance
            * of http.ClientRequest in Node.js
            */
-        data = error.request
+        data = error
         // console.log(error.request);
       } else {
         // Something happened in setting up the request and triggered an Error

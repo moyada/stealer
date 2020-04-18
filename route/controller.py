@@ -1,7 +1,7 @@
 from django.http import *
 
 # Create your views here.
-from core import handler_mapper, filter
+from core import handler_mapper
 from core.model import ErrorResult
 from core.type import Video
 
