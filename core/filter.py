@@ -1,13 +1,21 @@
 import schedule
+import logging
 
+# 生成一个以当前文件名为名字的logger实例
+logger = logging.getLogger(__name__)
 
 invoke_counter = {
 }
 
 
+def do_clear():
+    logger.info('Run clear filter job.')
+    invoke_counter.clear()
+
+
 def init_job():
-    print('Init clear filter job.')
-    schedule.every().day.at("00:00").do(invoke_counter.clear, 'clear filter')
+    logger.info('Init clear filter job.')
+    schedule.every().day.at("00:00").do(do_clear, 'clear filter')
 
 
 def get_ip(request) -> str:
@@ -21,7 +29,7 @@ def get_ip(request) -> str:
 
 def is_filter(request) -> bool:
     ip = get_ip(request)
-    print('request ip >>> {}'.format(ip))
+    logger.info('request ip >>> {}'.format(ip))
     val = invoke_counter.get(ip)
     if val is None:
         invoke_counter[ip] = 1

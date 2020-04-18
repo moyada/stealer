@@ -1,10 +1,12 @@
 import os
-
+import logging
 from requests import Response
 
 from tools import terminal, system
 from core.type import Video
 
+
+logger = logging.getLogger(__name__)
 base_path = os.getcwd() + "/video/"
 
 
@@ -32,4 +34,4 @@ def save(vtype: Video, res: Response, index: str):
         command = 'md5'
     else:
         command = 'md5sum'
-    print(terminal.run_cmd('sh video/remd5.sh {} {}'.format(command, filename)))
+    logger.info(terminal.run_cmd('sh video/remd5.sh {} {}'.format(command, filename)))

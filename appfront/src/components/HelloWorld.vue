@@ -66,9 +66,10 @@
         });
         return
       }
+      this.loading = true
       this.$axios.get('video/fetch?type=' + this.selectedType + '&url=' + url)
         .then((res) => {
-          console.log(res)
+          this.loading = false
           if (res.status === 200) {
             this.downloadAddr = res.data
           } else {
@@ -76,6 +77,7 @@
             this.downloadAddr = ''
           }
         }).catch((err) => {
+            this.loading = false
             this.$message.error('地址分析失败, ' + this.getErrData(err))
             this.downloadAddr = ''
         })
@@ -89,10 +91,12 @@
         });
         return
       }
+      this.loading = true
       // window.open('video/download?type=' + this.selectedType + '&url=' + url, '_self')
       this.$axios.get('video/download?type=' + this.selectedType + '&url=' + url, {
         responseType: 'blob'
       }).then((res) => {
+        this.loading = false
         let filename = res.headers['content-disposition'];
         let index = filename.indexOf('filename=')
         filename = filename.substring(index + 10, filename.length - 1)
@@ -104,7 +108,10 @@
         document.body.appendChild(link);
         link.click();
         link.remove();
-      }).catch(err => this.$message.error('视频下载失败, ' + this.getErrData(err)))
+      }).catch(err => {
+        this.loading = false
+        this.$message.error('视频下载失败, ' + this.getErrData(err))
+      })
     }
   }
   }
