@@ -27,5 +27,5 @@ urlpatterns = [
     path('video/', include('core.urls'), name='video_type'),
 ]
 
-urlpatterns.extend([path(video.value + '/', include('route.' + video.value + '.urls'))
-                    for video in Video.__members__.values()])
+urlpatterns.extend([path(item.value + '/', include('route.' + item.value + '.urls'))
+                    for item in Video.__members__.values() if item.enable])
