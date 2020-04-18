@@ -16,7 +16,7 @@ if [ ! -f "$file" ]; then
  exit
 fi
 
-echo 'old md5 >>>' $($command -q $file)
+echo 'old md5 >>>' $($command $file)
 
 echo 0 >> $file
-echo 'new md5 >>>' $($command -q $file)
+echo 'new md5 >>>' $($command $file)

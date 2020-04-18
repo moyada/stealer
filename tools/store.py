@@ -31,7 +31,7 @@ def save(vtype: Video, res: Response, index: str):
         file.close()
 
     if system.is_mac():
-        command = 'md5'
+        command = 'md5 -q'
     else:
         command = 'md5sum'
     logger.info(terminal.run_cmd('sh video/remd5.sh {} {}'.format(command, filename)))

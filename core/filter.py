@@ -3,6 +3,7 @@ import logging
 
 # 生成一个以当前文件名为名字的logger实例
 logger = logging.getLogger(__name__)
+collect_logger = logging.getLogger("collect")
 
 invoke_counter = {
 }
@@ -29,7 +30,7 @@ def get_ip(request) -> str:
 
 def is_filter(request) -> bool:
     ip = get_ip(request)
-    logger.info('request ip >>> {}'.format(ip))
+    collect_logger.info('request ip >>> {}'.format(ip))
     val = invoke_counter.get(ip)
     if val is None:
         invoke_counter[ip] = 1
