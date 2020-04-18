@@ -36,7 +36,11 @@ class Result:
 
 @unique
 class ErrorResult(Result, Enum):
-    URL_NOT_FOUNT = False, 'url not found.'
+    TOO_MANY_OPERATE = False, 'too many operate.'
+    URL_NOT_PRESENT = False, 'url is not present.'
+    TYPE_NOT_PRESENT = False, 'type is not present.'
+    MAPPER_NOT_EXIST = False, 'type mapper not exist.'
+    URL_NOT_INCORRECT = False, 'url is incorrect.'
     VIDEO_ADDRESS_NOT_FOUNT = False, 'video address not found.'
 
     def __init__(self, *value):

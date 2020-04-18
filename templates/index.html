@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+
+<script src="https://cdn.staticfile.org/vue/2.6.11/vue.min.js"></script>
+
+{% if items %}
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <script type='text/javascript'>
+    var people = {{ items_json|safe }};
+  </script>
+
+  <div id="app">
+      {{ items }}
+    <ul>
+      <li v-for="person in people">
+        <a v-bind:href="person.url">[[ person.name ]]</a> <button v-on:click="greet(person.name)">hey</button>
+      </li>
+    </ul>
+  </div>
+
+  <script>
+    var app = new Vue({
+      delimiters: ['[[', ']]'],
+      el: '#app',
+      data: {
+          message: 'Hello Vue!',
+          people: people,
+      },
+      methods: {
+          greet: function(name) {
+              console.log('Hello from ' + name + '!')
+          }
+      }
+    });
+  </script>
+{% else %}
+  <p>No items available.</p>
+{% endif %}

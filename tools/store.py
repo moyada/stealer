@@ -3,7 +3,7 @@ import os
 from requests import Response
 
 from tools import terminal
-from tools.type import Video
+from core.type import Video
 
 base_path = os.getcwd() + "/video/"
 

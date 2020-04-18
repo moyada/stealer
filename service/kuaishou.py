@@ -1,10 +1,11 @@
 import re
 from django.http import HttpResponse, HttpResponseServerError
 
-from stealer.interface import Service
-from stealer.model import Result, ErrorResult
-from tools import store, analyzer, http_utils, config
-from tools.type import Video
+from core.interface import Service
+from core.model import Result, ErrorResult
+from tools import store, analyzer, http_utils
+from core import config
+from core.type import Video
 
 
 headers = {
@@ -45,7 +46,7 @@ class KuaishouService(Service):
         """
         url = analyzer.get_url(vtype, url)
         if url is None:
-            return ErrorResult.URL_NOT_FOUNT
+            return ErrorResult.URL_NOT_INCORRECT
 
         # 请求短链接，获得itemId和dytk
         res = http_utils.get(url, header=headers)

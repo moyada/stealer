@@ -1,9 +1,9 @@
 # Create your views here.
 from route import controller
-from tools.type import Video
+from core.type import Video
 
 
-vtype = Video.XIGUA
+vtype = Video
 
 
 def fetch(request):

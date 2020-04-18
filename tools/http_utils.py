@@ -50,8 +50,8 @@ def execute(url, param, header, mode=1) -> Union[Optional[Response], Exception]:
     if success:
         return resp
 
-    # raise HttpException(resp.status_code, resp.content)
-    return HttpException(resp.status_code, resp.content)
+    # raise HttpException(resp.status_code, resp.reason)
+    return HttpException(resp.status_code, resp.reason)
 
 
 if __name__ == '__main__':

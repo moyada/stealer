@@ -13,18 +13,19 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.contrib import admin
 from django.urls import path, include
+from django.views.generic import TemplateView
 
-from service import index
+from core import apis
+from core.type import Video
 
 urlpatterns = [
     # path('admin/', admin.site.urls),
-    path('', index.index, name='index'),
-    path('ip/', index.ip, name='ip'),
-    path('douyin/', include('route.douyin.urls')),
-    path('kuaishou/', include('route.kuaishou.urls')),
-    path('huoshan/', include('route.huoshan.urls')),
-    path('pipixia/', include('route.pipixia.urls')),
-    # path('xigua/', include('route.xigua.urls')),
+    path('', TemplateView.as_view(template_name="index.html"), name='index'),
+    # path('', index.index, name='index'),
+    path('ip/', apis.ip, name='ip'),
+    path('video/', include('core.urls'), name='video_type'),
 ]
+
+urlpatterns.extend([path(video.value + '/', include('route.' + video.value + '.urls'))
+                    for video in Video.__members__.values()])

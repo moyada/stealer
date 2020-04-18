@@ -1,6 +1,6 @@
 from django.http import HttpResponse, FileResponse
 
-from stealer.model import Result
+from core.model import Result
 
 
 class Service:

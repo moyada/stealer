@@ -1,7 +1,7 @@
 import re
 from typing import Optional
 
-from tools.type import Video
+from core.type import Video
 
 
 def get_douyin_url(text: str) -> Optional[str]:
