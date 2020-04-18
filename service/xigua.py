@@ -25,7 +25,7 @@ download_headers = {
     "user-agent": config.user_agent
 }
 
-vtype = Video
+vtype = Video.XIGUA
 
 
 class XiguaService(Service):
