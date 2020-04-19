@@ -1,5 +1,7 @@
 import json
 import re
+from typing import Optional
+
 from django.http import HttpResponse, HttpResponseServerError
 
 from core.interface import Service
@@ -39,9 +41,12 @@ vtype = Video.PIPIXIA
 class PipixiaService(Service):
 
     @classmethod
-    def index(cls, url) -> str:
+    def index(cls, url) -> Optional[str]:
         index = re.findall(r'(?<=s\/)\w+', url)
-        return index[0]
+        try:
+            return index[0]
+        except IndexError:
+            return None
 
     @classmethod
     def fetch(cls, url: str, model=0) -> Result:
@@ -61,8 +66,8 @@ class PipixiaService(Service):
 
         try:
             id = re.findall(r"(?<=item\/)(\d+)(?=\?)", res.url)[0]
-        except KeyError:
-            return Result.failed(res.text)
+        except IndexError:
+            return Result.failed(res.reason)
 
         url = "https://h5.pipix.com/bds/webapi/item/detail/?item_id=" + id + "&source=share"
 
@@ -74,7 +79,7 @@ class PipixiaService(Service):
 
         try:
             url = data['data']['item']['origin_video_download']['url_list'][0]['url']
-        except KeyError:
+        except (KeyError, IndexError):
             return ErrorResult.VIDEO_ADDRESS_NOT_FOUNT
 
         return Result.success(url)

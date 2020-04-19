@@ -87,7 +87,7 @@ LOGGING = {
         },
         # 定义一个特殊的日志格式
         'collect': {
-            'format': '%(message)s'
+            'format': '[%(asctime)s][%(message)s]'
         }
     },
     # 过滤器

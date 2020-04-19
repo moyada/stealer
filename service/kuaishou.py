@@ -32,11 +32,6 @@ vtype = Video.KUAISHOU
 class KuaishouService(Service):
 
     @classmethod
-    def index(cls, url) -> str:
-        index = re.findall(r'(?<=com\/)\w+', url)
-        return index[0]
-
-    @classmethod
     def fetch(cls, url: str, model=0) -> Result:
         """
         获取视频详情
@@ -54,7 +49,10 @@ class KuaishouService(Service):
             return Result.error(res)
 
         html = res.text
-        url = re.findall(r"(?<=srcNoMark&#34;:&#34;)(.*?)(?=&)", html)[0]
+        try:
+            url = re.findall(r"(?<=srcNoMark&#34;:&#34;)(.*?)(?=&)", html)[0]
+        except IndexError:
+            return Result.failed(res.text)
         if not url:
             return ErrorResult.VIDEO_ADDRESS_NOT_FOUNT
 

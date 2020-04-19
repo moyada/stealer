@@ -1,5 +1,7 @@
 
 import re
+from typing import Optional
+
 from django.http import HttpResponse, HttpResponseServerError
 
 from core.interface import Service
@@ -29,11 +31,6 @@ vtype = Video.DOUYIN
 class DouyinService(Service):
 
     @classmethod
-    def index(cls, url) -> str:
-        index = re.findall(r'(?<=com\/)\w+', url)
-        return index[0]
-
-    @classmethod
     def fetch(cls, url: str, model=0) -> Result:
         """
         获取视频详情
@@ -51,8 +48,11 @@ class DouyinService(Service):
             return Result.error(res)
 
         html = str(res.content)
-        item_id = re.findall(r"(?<=itemId:\s\")\d+", html)[0]
-        dytk = re.findall(r"(?<=dytk:\s\")(.*?)(?=\")", html)[0]
+        try:
+            item_id = re.findall(r"(?<=itemId:\s\")\d+", html)[0]
+            dytk = re.findall(r"(?<=dytk:\s\")(.*?)(?=\")", html)[0]
+        except IndexError:
+            return Result.failed(res.reason)
 
         # 组装视频长链接
         infourl = "https://www.iesdouyin.com/web/api/v2/aweme/iteminfo/?item_ids=" + item_id + "&dytk=" + dytk
@@ -63,8 +63,10 @@ class DouyinService(Service):
             return Result.error(url_res)
 
         vhtml = str(url_res.text)
-        uri = re.findall(r'(?<=\"uri\":\")\w{32}(?=\")', vhtml)[0]
-
+        try:
+            uri = re.findall(r'(?<=\"uri\":\")\w{32}(?=\")', vhtml)[0]
+        except IndexError:
+            return Result.failed(url_res.reason)
         if not uri:
             return ErrorResult.VIDEO_ADDRESS_NOT_FOUNT
 

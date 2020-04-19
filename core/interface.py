@@ -1,3 +1,6 @@
+import re
+from typing import Optional
+
 from django.http import HttpResponse, FileResponse
 
 from core.model import Result
@@ -6,8 +9,12 @@ from core.model import Result
 class Service:
 
     @classmethod
-    def index(cls, url) -> str:
-        pass
+    def index(cls, url) -> Optional[str]:
+        index = re.findall(r'(?<=com\/)\w+', url)
+        try:
+            return index[0]
+        except IndexError:
+            return None
 
     @classmethod
     def fetch(cls, url: str, model=0) -> Result:

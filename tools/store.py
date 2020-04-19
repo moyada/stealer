@@ -11,6 +11,8 @@ base_path = os.getcwd() + "/video/"
 
 
 def find(vtype: Video, index: str) -> object:
+    if index is None:
+        return None
     filename = get_name(vtype, index)
     if not os.path.exists(filename):
         return None

@@ -1,5 +1,7 @@
 
 import re
+from typing import Optional
+
 from django.http import HttpResponse, HttpResponseServerError
 
 from core.interface import Service
@@ -38,9 +40,12 @@ vtype = Video.HUOSHAN
 class HuoshanService(Service):
 
     @classmethod
-    def index(cls, url) -> str:
+    def index(cls, url) -> Optional[str]:
         index = re.findall(r'(?<=s\/)\w+', url)
-        return index[0]
+        try:
+            return index[0]
+        except IndexError:
+            return None
 
     @classmethod
     def fetch(cls, url: str, model=0) -> Result:
@@ -59,7 +64,10 @@ class HuoshanService(Service):
         if http_utils.is_error(res):
             return Result.error(res)
 
-        item_id = re.findall(r"(?<=item_id=)\d+(?=\&)", res.url)[0]
+        try:
+            item_id = re.findall(r"(?<=item_id=)\d+(?=\&)", res.url)[0]
+        except IndexError:
+            return Result.failed(res.reason)
 
         # 视频信息链接
         infourl = "https://share.huoshan.com/api/item/info?item_id=" + item_id
@@ -70,7 +78,10 @@ class HuoshanService(Service):
             return Result.error(url_res)
 
         vhtml = str(url_res.text)
-        video_id = re.findall(r'(?<=video_id\=)\w+(?=\&)', vhtml)[0]
+        try:
+            video_id = re.findall(r'(?<=video_id\=)\w+(?=\&)', vhtml)[0]
+        except IndexError:
+            return Result.failed(url_res.reason)
 
         if not video_id:
             return ErrorResult.VIDEO_ADDRESS_NOT_FOUNT

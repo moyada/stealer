@@ -31,11 +31,6 @@ vtype = Video.XIGUA
 class XiguaService(Service):
 
     @classmethod
-    def index(cls, url) -> str:
-        index = re.findall(r'(?<=com\/)\w+', url)
-        return index[0]
-
-    @classmethod
     def fetch(cls, url: str, model=0) -> Result:
         """
         获取视频详情
