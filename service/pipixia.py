@@ -59,7 +59,11 @@ class PipixiaService(Service):
         if http_utils.is_error(res):
             return Result.error(res)
 
-        id = re.findall(r"(?<=item\/)(\d+)(?=\?)", res.url)[0]
+        try:
+            id = re.findall(r"(?<=item\/)(\d+)(?=\?)", res.url)[0]
+        except KeyError:
+            return Result.failed(res.text)
+
         url = "https://h5.pipix.com/bds/webapi/item/detail/?item_id=" + id + "&source=share"
 
         info_res = http_utils.get(url, header=share_headers)

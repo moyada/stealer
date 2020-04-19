@@ -9,8 +9,8 @@ pip3 install enum
 pip3 install json
 ```
 
-下载解压完运行 `start.sh` 或 `run.sh`，通过浏览器打开 `localhost:8000` 进入使用页面。
+下载解压完运行 `start.sh` 或 `run.sh`，通过浏览器打开 [localhost:8000](http://localhost:8000) 进入使用页面。
 
 [试用地址](http://119.23.110.20:8000/) 
 
-> 小破服务器，每天试用 3 次
+> 小破服务器，每天试用 5 次
