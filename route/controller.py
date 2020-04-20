@@ -7,7 +7,7 @@ from core import handler_mapper
 from core.model import ErrorResult
 from core.type import Video
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('request')
 
 
 def fetch(vtype: Video, request):
