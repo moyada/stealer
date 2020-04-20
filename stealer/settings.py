@@ -15,7 +15,6 @@ import os
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
@@ -26,7 +25,6 @@ SECRET_KEY = 'f+_rkz^(+yh7bz3h)t87es+shbw5k8cl2+y6i2hdpk!^j311zu'
 DEBUG = True
 
 ALLOWED_HOSTS = ['*']
-
 
 # Application definition
 
@@ -120,10 +118,20 @@ LOGGING = {
             'level': 'ERROR',
             'class': 'logging.handlers.RotatingFileHandler',  # 保存到文件，自动切
             'filename': os.path.join(BASE_LOG_DIR, "error.log"),  # 日志文件
-            'maxBytes': 1024 * 1024 * 50,  # 日志大小 50M
+            'maxBytes': 1024 * 1024 * 20,  # 日志大小 20M
             'backupCount': 5,
             'formatter': 'standard',
             'encoding': 'utf-8',
+        },
+        # 记录请求
+        'request': {
+            'level': 'INFO',
+            'class': 'logging.handlers.RotatingFileHandler',  # 保存到文件，自动切
+            'filename': os.path.join(BASE_LOG_DIR, "request.log"),
+            'maxBytes': 1024 * 1024 * 20,  # 日志大小 20M
+            'backupCount': 5,
+            'formatter': 'simple',
+            'encoding': "utf-8"
         },
         # 专门定义一个收集特定信息的日志
         'collect': {
@@ -137,22 +145,24 @@ LOGGING = {
         }
     },
     'loggers': {
-       # 默认的logger应用如下配置
+        # 默认的logger应用如下配置
         '': {
             'handlers': ['default', 'console', 'error'],  # 上线之后可以把'console'移除
             'level': 'DEBUG',
             'propagate': True,  # 向不向更高级别的logger传递
         },
-        # 名为 'collect'的logger还单独处理
         'collect': {
             'handlers': ['console', 'collect'],
+            'level': 'INFO',
+        },
+        'request': {
+            'handlers': ['request'],
             'level': 'INFO',
         }
     },
 }
 
 WSGI_APPLICATION = 'stealer.wsgi.application'
-
 
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
@@ -163,7 +173,6 @@ DATABASES = {
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
@@ -183,7 +192,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/3.0/topics/i18n/
 
@@ -196,7 +204,6 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
