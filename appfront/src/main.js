@@ -27,6 +27,9 @@ function blobToString(b) {
 
 Vue.mixin({
   methods: {
+    blobToString: (b) => {
+      return blobToString(b)
+    },
     getErrData:(error) => {
     // Error 😨
       let data;

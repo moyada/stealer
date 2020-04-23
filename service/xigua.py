@@ -1,11 +1,12 @@
 import re
-from django.http import HttpResponse, HttpResponseServerError
+from django.http import HttpResponse
 
 from core.interface import Service
 from core.model import Result, ErrorResult
-from tools import store, analyzer, http_utils
+from tools import http_utils
 from core import config
 from core.type import Video
+
 
 headers = {
     "accept": "*/*",
@@ -31,14 +32,16 @@ vtype = Video.XIGUA
 class XiguaService(Service):
 
     @classmethod
-    def fetch(cls, url: str, model=0) -> Result:
-        """
-        获取视频详情
-        :param url:
-        :param model:
-        :return:
-        """
-        url = analyzer.get_url(vtype, url)
+    def get_prefix_pattern(cls) -> str:
+        return 'ixigua\.com\/'
+
+    @classmethod
+    def make_url(cls, index) -> str:
+        return 'https://www.ixigua.com/' + index
+
+    @classmethod
+    def fetch(cls, url: str, mode=0) -> Result:
+        url = cls.get_url(url)
         if url is None:
             return ErrorResult.URL_NOT_INCORRECT
 
@@ -53,36 +56,10 @@ class XiguaService(Service):
             return ErrorResult.VIDEO_ADDRESS_NOT_FOUNT
 
         result = Result.success(url)
-        if model != 0:
+        if mode != 0:
             result.ref = res.url
         return result
 
     @classmethod
     def download(cls, url) -> HttpResponse:
-        """
-        下载视频
-        :param url:
-        :return:
-        """
-        # 检查文件
-        index = cls.index(url)
-        file = store.find(vtype, index)
-        if file is not None:
-            return Service.stream(file, index)
-
-        result = cls.fetch(url, model=1)
-        if not result.is_success():
-            return HttpResponseServerError(result.get_data())
-
-        dheaders = download_headers.copy()
-        dheaders['referer'] = result.ref
-
-        res = http_utils.get(url=result.get_data(), header=dheaders)
-        if http_utils.is_error(res):
-            return HttpResponseServerError(str(res))
-
-        store.save(vtype, res, index)
-        res.close()
-
-        file = store.find(vtype, index)
-        return Service.stream(file, index)
+        return cls.proxy_download(vtype, url, download_headers)

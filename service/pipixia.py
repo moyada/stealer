@@ -2,13 +2,14 @@ import json
 import re
 from typing import Optional
 
-from django.http import HttpResponse, HttpResponseServerError
+from django.http import HttpResponse
 
 from core.interface import Service
 from core.model import Result, ErrorResult
-from tools import store, analyzer, http_utils
+from tools import http_utils
 from core import config
 from core.type import Video
+
 
 headers = {
     "accept": "*/*",
@@ -41,6 +42,14 @@ vtype = Video.PIPIXIA
 class PipixiaService(Service):
 
     @classmethod
+    def get_prefix_pattern(cls) -> str:
+        return 'h5\.pipix\.com/s\/'
+
+    @classmethod
+    def make_url(cls, index) -> str:
+        return 'http://h5.pipix.com/s/' + index
+
+    @classmethod
     def index(cls, url) -> Optional[str]:
         index = re.findall(r'(?<=s\/)\w+', url)
         try:
@@ -49,14 +58,8 @@ class PipixiaService(Service):
             return None
 
     @classmethod
-    def fetch(cls, url: str, model=0) -> Result:
-        """
-        获取视频详情
-        :param url:
-        :param model:
-        :return:
-        """
-        url = analyzer.get_url(vtype, url)
+    def fetch(cls, url: str, mode=0) -> Result:
+        url = cls.get_url(url)
         if url is None:
             return ErrorResult.URL_NOT_INCORRECT
 
@@ -84,32 +87,13 @@ class PipixiaService(Service):
 
         return Result.success(url)
 
+    @staticmethod
+    def download_header():
+        return download_headers
+
     @classmethod
     def download(cls, url) -> HttpResponse:
-        """
-        下载视频
-        :param url:
-        :return:
-        """
-        # 检查文件
-        index = cls.index(url)
-        file = store.find(vtype, index)
-        if file is not None:
-            return Service.stream(file, index)
-
-        result = cls.fetch(url)
-        if not result.is_success():
-            return HttpResponseServerError(result.get_data())
-
-        res = http_utils.get(url=result.get_data(), header=download_headers)
-        if http_utils.is_error(res):
-            return HttpResponseServerError(str(res))
-
-        store.save(vtype, res, index)
-        res.close()
-
-        file = store.find(vtype, index)
-        return Service.stream(file, index)
+        return cls.proxy_download(vtype, url, download_headers, mode=0)
 
 
 if __name__ == '__main__':

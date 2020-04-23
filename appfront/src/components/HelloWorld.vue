@@ -26,7 +26,19 @@
   </div>
 </template>
 
+
 <script>
+  function download(url, filename = '')  {
+    const link = document.createElement('a');
+    link.style.display = 'none';
+    link.href = url;
+    link.setAttribute('download', filename);
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+
   export default {
     name: 'home',
     delimiters: ['[[', ']]'],
@@ -47,18 +59,18 @@
       this.$axios.get('video/list')
         .then((res) => {
           if (res.status !== 200) {
-            this.$message.error('数据读取失败!')
+            this.$message.error('数据读取失败!');
             return
           }
-          this.options = res.data
-          this.selectedType = res.data[0].value
+          this.options = res.data;
+          this.selectedType = res.data[0].value;
         }).catch(err => this.$message.error('数据读取失败!' + this.getErrData(err)))
     },
     selectType(value) {
       this.selectedType = value
     },
     fetch() {
-      let url = this.inputUrl.trim()
+      let url = this.inputUrl.trim();
       if (url === '') {
         this.$message({
           message: '分享地址不能为空',
@@ -66,24 +78,24 @@
         });
         return
       }
-      this.loading = true
+      this.loading = true;
       this.$axios.get('video/fetch?type=' + this.selectedType + '&url=' + url)
         .then((res) => {
-          this.loading = false
+          this.loading = false;
           if (res.status === 200) {
             this.downloadAddr = res.data
           } else {
-            this.$message.error('地址分析失败, ' + res.data)
-            this.downloadAddr = ''
+            this.$message.error('地址分析失败, ' + res.data);
+            this.downloadAddr = '';
           }
         }).catch((err) => {
-            this.loading = false
-            this.$message.error('地址分析失败, ' + this.getErrData(err))
-            this.downloadAddr = ''
+            this.loading = false;
+            this.$message.error('地址分析失败, ' + this.getErrData(err));
+            this.downloadAddr = '';
         })
     },
     download() {
-      let url = this.inputUrl.trim()
+      let url = this.inputUrl.trim();
       if (url === '') {
         this.$message({
           message: '分享地址不能为空',
@@ -91,25 +103,40 @@
         });
         return
       }
-      this.loading = true
-      // window.open('video/download?type=' + this.selectedType + '&url=' + url, '_self')
+      this.loading = true;
       this.$axios.get('video/download?type=' + this.selectedType + '&url=' + url, {
         responseType: 'blob'
       }).then((res) => {
-        this.loading = false
+        // console.log(res);
+        this.loading = false;
+        let url;
         let filename = res.headers['content-disposition'];
-        let index = filename.indexOf('filename=')
-        filename = filename.substring(index + 10, filename.length - 1)
+        if (filename !== undefined) {
+          const index = filename.indexOf('filename=');
+          filename = filename.substring(index + 10, filename.length - 1);
+          url = window.URL.createObjectURL(new Blob([res.data]));
+          download(url, filename);
+          window.URL.revokeObjectURL(url)
+          return
+        }
 
-        const url = window.URL.createObjectURL(new Blob([res.data]));
-        const link = document.createElement('a');
-        link.href = url;
-        link.setAttribute('download', filename);
-        document.body.appendChild(link);
-        link.click();
-        link.remove();
+        const data = this.blobToString(res.data);
+        const info = JSON.parse(data);
+        // window.open(info['url'], '_blank')
+        fetch(info['url'], {
+          // headers: new Headers({
+          //   Origin: location.origin,
+          // }),
+          mode: 'cors',
+        })
+        .then(res => res.blob())
+        .then(blob => {
+          url = window.URL.createObjectURL(blob);
+          download(url, info['name']);
+          window.URL.revokeObjectURL(url)
+        });
       }).catch(err => {
-        this.loading = false
+        this.loading = false;
         this.$message.error('视频下载失败, ' + this.getErrData(err))
       })
     }
