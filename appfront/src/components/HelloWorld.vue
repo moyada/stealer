@@ -2,8 +2,8 @@
 <template>
   <div>
     <el-row display="margin-top: 10px">
-      <el-input v-model="inputUrl" placeholder="请输入分享地址" style="display:inline-table; width: 50%;"></el-input>
-      <el-select v-model="selectedType" @change="selectType(selectedType)" size="large" style="margin: 2px;">
+      <el-input v-model="inputUrl" placeholder="请输入分享地址" style="display:inline-table; width: 30%;"></el-input>
+      <el-select v-model="selectedType" @change="selectType(selectedType)" size="large" style="margin: 2px; width: 10%">
         <el-option
             v-for="item in options"
             :key="item.value"
@@ -13,8 +13,21 @@
 <!--          <span style="font-size: large">{{ item.label }}</span>-->
         </el-option>
       </el-select>
-      <el-button v-loading="loading" @click="fetch()" style="margin: 2px;">分析</el-button>
-      <el-button v-loading="loading" @click="download()" type="primary" plain style="margin: 2px;">下载</el-button>
+      <el-popover
+        placement="top-start"
+        width="200"
+        trigger="hover">
+        <span style="color: #b0b0b0">直接下载</span>
+        <el-button slot="reference" :loading="loading" @click="download()" type="primary" plain style="margin: 2px;">下载</el-button>
+      </el-popover>
+
+      <el-popover
+        placement="top-start"
+        width="200"
+        trigger="hover">
+        <span style="color: #b0b0b0">获取下载链接</span>
+        <el-button slot="reference" :loading="loading" @click="fetch()" style="margin: 2px;">分析</el-button>
+      </el-popover>
     </el-row>
 
     <div v-if="downloadAddr !== ''" style="margin-top: 10px; padding-left: 20%; padding-right: 20%;">
@@ -116,7 +129,7 @@
           filename = filename.substring(index + 10, filename.length - 1);
           url = window.URL.createObjectURL(new Blob([res.data]));
           download(url, filename);
-          window.URL.revokeObjectURL(url)
+          window.URL.revokeObjectURL(url);
           return
         }
 

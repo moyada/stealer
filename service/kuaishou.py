@@ -54,7 +54,8 @@ class KuaishouService(Service):
         try:
             url = re.findall(r"(?<=srcNoMark&#34;:&#34;)(.*?)(?=&)", html)[0]
         except IndexError:
-            return Result.failed(res.text)
+            return ErrorResult.VIDEO_ADDRESS_NOT_FOUNT
+
         if not url:
             return ErrorResult.VIDEO_ADDRESS_NOT_FOUNT
 
