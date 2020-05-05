@@ -44,6 +44,6 @@ class ErrorResult(Result, Enum):
     VIDEO_ADDRESS_NOT_FOUNT = False, '视频地址获取失败.'
 
     def __init__(self, *value):
-        super().__init__(success=value[0], data=value[1])  # init Song
+        super(self.__class__, self).__init__(success=value[0], data=value[1])
         # super(Enum, self).__init__()
 
