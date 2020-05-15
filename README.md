@@ -15,4 +15,3 @@ pip3 install enum34
 
 [试用地址](http://www.didaho.com/#/watermark) 
 
-> 小破服务器，每天试用 5 次
