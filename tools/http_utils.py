@@ -40,9 +40,7 @@ def execute(url, param, header, mode=1) -> Union[Optional[Response], Exception]:
 
     try:
         if mode == 1:
-            resp = requests.get(url, headers=header, data=param, timeout=20,
-                                proxies={'sock5': 'http://127.0.0.1:1080'}
-                            )
+            resp = requests.get(url, headers=header, data=param, timeout=20)
         else:
             resp = requests.post(url, headers=header, data=param, timeout=20)
     except Exception as e:
