@@ -1,4 +1,5 @@
 import logging
+from typing import Union, Optional, Any
 
 from django.http import *
 
@@ -15,6 +16,10 @@ def fetch(vtype: Video, request):
     if url is None:
         return HttpResponseBadRequest(ErrorResult.URL_NOT_PRESENT.get_data())
 
+    vtype = check_vtype(vtype, url)
+    if vtype is None:
+        return HttpResponseBadRequest(ErrorResult.URL_NOT_INCORRECT.get_data())
+
     service = handler_mapper.get_service(vtype)
     logger.info('fetch {} <== {}.'.format(vtype.label, url))
     result = service.fetch(url)
@@ -28,7 +33,21 @@ def download(vtype: Video, request):
     if url is None:
         return HttpResponseBadRequest(ErrorResult.URL_NOT_PRESENT.get_data())
 
+    vtype = check_vtype(vtype, url)
+    if vtype is None:
+        return HttpResponseBadRequest(ErrorResult.URL_NOT_INCORRECT.get_data())
+
     service = handler_mapper.get_service(vtype)
     logger.info('download {} <== {}.'.format(vtype.label, url))
     response = service.download(url)
     return response
+
+
+def check_vtype(vtype: Video, url: str) -> Union[Optional[Video], Any]:
+    if vtype is not Video.AUTO:
+        return vtype
+
+    for v, service in handler_mapper.service_mapper.items():
+        if service.get_url(url):
+            return v
+    return None

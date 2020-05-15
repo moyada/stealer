@@ -116,42 +116,56 @@
         });
         return
       }
-      this.loading = true;
-      this.$axios.get('video/download?type=' + this.selectedType + '&url=' + url, {
-        responseType: 'blob'
-      }).then((res) => {
-        // console.log(res);
-        this.loading = false;
-        let url;
-        let filename = res.headers['content-disposition'];
-        if (filename !== undefined) {
-          const index = filename.indexOf('filename=');
-          filename = filename.substring(index + 10, filename.length - 1);
-          url = window.URL.createObjectURL(new Blob([res.data]));
-          download(url, filename);
-          window.URL.revokeObjectURL(url);
-          return
-        }
 
-        const data = this.blobToString(res.data);
-        const info = JSON.parse(data);
-        // window.open(info['url'], '_blank')
-        fetch(info['url'], {
-          // headers: new Headers({
-          //   Origin: location.origin,
-          // }),
-          mode: 'cors',
+      this.loading = true;
+      fetch('video/download?type=' + this.selectedType + '&url=' + url,{
+          responseType: 'blob'
         })
-        .then(res => res.blob())
-        .then(blob => {
-          url = window.URL.createObjectURL(blob);
-          download(url, info['name']);
-          window.URL.revokeObjectURL(url)
-        });
-      }).catch(err => {
-        this.loading = false;
-        this.$message.error('视频下载失败, ' + this.getErrData(err))
-      })
+        .then(res => {
+          if (!res.ok) {
+            throw res.text()
+          }
+
+          let filename = res.headers.get('content-disposition');
+
+          let data;
+          if (filename !== null && filename !== undefined) {
+            const index = filename.indexOf('filename=');
+            filename = filename.substring(index + 10, filename.length - 1);
+            data = res.blob()
+          } else {
+            filename = null
+            data = res.text()
+          }
+          return ({data: data, filename: filename});
+        })
+        .then(({data, filename}) => {
+          if (filename !== null) {
+            data.then(data => {
+              url = window.URL.createObjectURL(data);
+              download(url, filename);
+              window.URL.revokeObjectURL(url)
+              this.loading = false;
+            });
+            return
+          }
+
+          data.then(text => {
+            const info = JSON.parse(text);
+            fetch(info['url'])
+              .then(res =>  res.blob())
+              .then(blob => {
+                url = window.URL.createObjectURL(blob);
+                download(url, info['name']);
+                window.URL.revokeObjectURL(url)
+                this.loading = false;
+              });
+            });
+        })
+        .catch(err => {
+          this.loading = false;
+          err.then(text => this.$message.error('视频下载失败, ' + text))
+      });
     }
   }
   }

@@ -4,8 +4,9 @@ from enum import Enum, unique
 
 @unique
 class Video(Enum):
+    AUTO = '自动适配', 'auto', True
     DOUYIN = '抖音', 'douyin', True
-    # TIKTOK = 'TikTok', 'tiktok'
+    TIKTOK = 'TikTok', 'tiktok', True
     KUAISHOU = '快手', 'kuaishou', True
     HUOSHAN = '火山小视频', 'huoshan', True
     XIGUA = ' 西瓜视频', 'xigua', False
