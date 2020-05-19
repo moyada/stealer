@@ -41,6 +41,8 @@
 
 
 <script>
+  import constant from "./constant";
+
   function download(url, filename = '')  {
     const link = document.createElement('a');
     link.style.display = 'none';
@@ -69,7 +71,7 @@
   },
   methods: {
     getTypes() {
-      this.$axios.get('video/list')
+      this.$axios.get(constant.host + 'video/list')
         .then((res) => {
           if (res.status !== 200) {
             this.$message.error('数据读取失败!');
@@ -92,7 +94,8 @@
         return
       }
       this.loading = true;
-      this.$axios.get('video/fetch?type=' + this.selectedType + '&url=' + url)
+
+      this.$axios.get(constant.host + 'video/fetch?type=' + this.selectedType + '&url=' + url)
         .then((res) => {
           this.loading = false;
           if (res.status === 200) {
@@ -118,7 +121,7 @@
       }
 
       this.loading = true;
-      fetch('video/download?type=' + this.selectedType + '&url=' + url,{
+      fetch(constant.host + 'video/download?type=' + this.selectedType + '&url=' + url,{
           responseType: 'blob'
         })
         .then(res => {

@@ -6,6 +6,7 @@
 pip3 install Django
 pip3 install requests
 pip3 install enum34
+pip3 install django-cors-headers
 ```
 
 下载解压完运行 `start.sh` 或 `run.sh`，通过浏览器打开 [localhost:8000](http://localhost:8000) 进入使用页面。
