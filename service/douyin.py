@@ -49,15 +49,16 @@ class DouyinService(Service):
         if http_utils.is_error(res):
             return Result.error(res)
 
-        html = str(res.content)
+        # html = str(res.content)
         try:
-            item_id = re.findall(r"(?<=itemId:\s\")\d+", html)[0]
-            dytk = re.findall(r"(?<=dytk:\s\")(.*?)(?=\")", html)[0]
+            item_id = re.findall(r"(?<=video/)\d+", res.url)[0]
+            # item_id = re.findall(r"(?<=itemId:\s\")\d+", html)[0]
+            # dytk = re.findall(r"(?<=dytk:\s\")(.*?)(?=\")", html)[0]
         except IndexError:
             return Result.failed(res.reason)
 
         # 组装视频长链接
-        infourl = "https://www.iesdouyin.com/web/api/v2/aweme/iteminfo/?item_ids=" + item_id + "&dytk=" + dytk
+        infourl = "https://www.iesdouyin.com/web/api/v2/aweme/iteminfo/?item_ids=" + item_id + "&dytk="# + dytk
 
         # 请求长链接，获取play_addr
         url_res = http_utils.get(infourl, header=headers)
