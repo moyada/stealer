@@ -52,13 +52,14 @@ class KuaishouService(Service):
 
         html = res.text
         try:
-            url = re.findall(r"(?<=type=\"video/mp4\" src=\")(.*?)(?=\")", html)[0]
+            url = re.findall(r"(?<=\"srcNoMark\":\"https://)(.*?)(?=.mp4)", html)[0]
         except IndexError:
             return ErrorResult.VIDEO_ADDRESS_NOT_FOUNT
 
         if not url:
             return ErrorResult.VIDEO_ADDRESS_NOT_FOUNT
 
+        url = "https://" + url + ".mp4"
         result = Result.success(url)
         if mode != 0:
             result.ref = res.url
