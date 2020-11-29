@@ -16,3 +16,9 @@ pip3 install django-cors-headers
 
 [试用地址](http://www.didaho.com/#/watermark) 
 
+### Docker 方式部署
+
+1. 首先将代码 `clone` 到本地。
+2. 构建镜像，运行命令  `docker build -t stealer-1.0.0 -f Dockerfile .` 即可生成镜像文件。
+3. 启动容器，运行命令 `docker run -d -p 8000:8000 dv-1.0.0:latest`
+4. 应用地址为[服务器IP:8000]
