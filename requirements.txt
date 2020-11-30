@@ -1,0 +1,4 @@
+Django>=3.0.1
+django-cors-headers>=3.5.0
+enum34>=1.1.10
+requests>=2.22.0
