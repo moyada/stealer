@@ -81,7 +81,7 @@ class PipixiaService(Service):
         data = json.loads(str(info_res.text))
 
         try:
-            url = data['data']['item']['comments'][0]['item']['video']['video_high']['url_list'][0]['url']
+            url = data['data']['item']['stats']['video']['video_download']['url_list'][0]['url']
         except (KeyError, IndexError):
             return ErrorResult.VIDEO_ADDRESS_NOT_FOUNT
 
