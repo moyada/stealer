@@ -20,6 +20,7 @@ headers = {
 share_headers = {
     "accept": "*/*",
     "accept-encoding": "gzip, deflate",
+    "authority": "h5.pipix.com",
     "sec-fetch-dest": "empty",
     "sec-fetch-mode": "cors",
     "sec-fetch-site": "same-origin",
@@ -81,7 +82,8 @@ class PipixiaService(Service):
         data = json.loads(str(info_res.text))
 
         try:
-            url = data['data']['item']['video']['video_download']['url_list'][0]['url']
+            video = data['data']['item']['comments'][0]['item']['video']
+            url = cls.get_video(video)
         except (KeyError, IndexError):
             return ErrorResult.VIDEO_ADDRESS_NOT_FOUNT
 
@@ -94,6 +96,16 @@ class PipixiaService(Service):
     @classmethod
     def download(cls, url) -> HttpResponse:
         return cls.proxy_download(vtype, url, download_headers, mode=0)
+
+    @staticmethod
+    def get_video(video: dict) -> Optional[str]:
+        if video['video_high'] is not None:
+            return video['video_high']['url_list'][0]['url']
+        if video['video_mid'] is not None:
+            return video['video_mid']['url_list'][0]['url']
+        if video['video_low'] is not None:
+            return video['video_low']['url_list'][0]['url']
+        return None
 
 
 if __name__ == '__main__':
