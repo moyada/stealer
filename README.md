@@ -1,12 +1,15 @@
 
-抖音、快手、火山视频。。。去水印程序 
+抖音、快手、皮皮虾、火山视频。。。去水印程序 
 
-项目使用 `python3` + `Vue` 开发，所需依赖有:
+项目使用 `python3` + `Vue` 开发，安装所需依赖:
+
+`pip install -r requirements.txt --index-url https://pypi.douban.com/simple`
+OR
 ```shell script
-pip3 install Django
-pip3 install requests
-pip3 install enum34
-pip3 install django-cors-headers
+pip install Django
+pip install requests
+pip install enum34
+pip install django-cors-headers
 ```
 
 下载解压完运行 `start.sh` 或 `run.sh`，通过浏览器打开 [localhost:8000](http://localhost:8000) 进入使用页面。
