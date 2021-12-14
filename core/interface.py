@@ -1,5 +1,6 @@
 import json
 import re
+import zipfile
 from typing import Optional
 
 from django.http import HttpResponse, FileResponse, HttpResponseServerError
@@ -78,12 +79,17 @@ class Service:
             header = header.copy()
             header['referer'] = result.ref
 
-        res = http_utils.get(url=result.get_data(), header=header)
-        if http_utils.is_error(res):
-            return HttpResponseServerError(str(res))
+        if result.is_image():
+            res = store.save_image(vtype, result.get_data(), index)
+            if res is not None:
+                return res
+        else:
+            res = http_utils.get(url=result.get_data(), header=header)
+            if http_utils.is_error(res):
+                return HttpResponseServerError(str(res))
 
-        store.save(vtype, res, index)
-        res.close()
+            store.save(vtype, res, index)
+            res.close()
 
         file = store.find(vtype, index)
         return Service.stream(file, index)
