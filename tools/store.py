@@ -1,8 +1,12 @@
 import os
 import logging
+import zipfile
+from typing import List
+
+from django.http import HttpResponseServerError
 from requests import Response
 
-from tools import terminal, system
+from tools import terminal, system, http_utils
 from core.type import Video
 
 
@@ -14,20 +18,22 @@ def find(vtype: Video, index: str) -> object:
     if index is None:
         return None
     filename = get_name(vtype, index)
-    if not os.path.exists(filename):
-        return None
-    return open(filename, 'rb')
+    if os.path.exists(filename + ".mp4"):
+        return open(filename + ".mp4", 'rb')
+    if os.path.exists(filename + ".zip"):
+        return open(filename + ".zip", 'rb')
+    return None
 
 
 def get_name(vtype: Video, index: str) -> str:
     path = base_path + vtype.value
     if not os.path.exists(path):
         os.mkdir(path)
-    return base_path + vtype.value + "/" + index + ".mp4"
+    return base_path + vtype.value + "/" + index
 
 
 def save(vtype: Video, res: Response, index: str):
-    filename = get_name(vtype, index)
+    filename = get_name(vtype, index) + ".mp4"
     with open(filename, 'wb')as file:
         file.write(res.content)
         file.close()
@@ -37,3 +43,16 @@ def save(vtype: Video, res: Response, index: str):
     else:
         command = 'md5sum'
     logger.info(terminal.run_cmd('sh video/remd5.sh {} {}'.format(command, filename)))
+
+
+def save_image(vtype: Video, images: List[str], index: str):
+    filename = get_name(vtype, index) + ".zip"
+    with zipfile.ZipFile(filename, 'w') as imgZip:
+        index = 1
+        for image in images:
+            res = http_utils.get(url=image)
+            if http_utils.is_error(res):
+                return HttpResponseServerError(str(res))
+            # res.headers.get('content-type')
+        imgZip.writestr(f"{index}.jpg", res.content)
+    return None

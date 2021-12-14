@@ -1,4 +1,4 @@
-
+import json
 import re
 
 from django.http import HttpResponse
@@ -32,6 +32,7 @@ class DouyinService(Service):
 
     @classmethod
     def get_prefix_pattern(cls) -> str:
+        # www.iesdouyin.com
         return 'douyin\.com\/'
 
     @classmethod
@@ -44,7 +45,7 @@ class DouyinService(Service):
         if url is None:
             return ErrorResult.URL_NOT_INCORRECT
 
-        # 请求短链接，获得itemId和dytk
+        # 请求短链接，获得itemId
         res = http_utils.get(url, header=headers)
         if http_utils.is_error(res):
             return Result.error(res)
@@ -52,8 +53,6 @@ class DouyinService(Service):
         # html = str(res.content)
         try:
             item_id = re.findall(r"(?<=video/)\d+", res.url)[0]
-            # item_id = re.findall(r"(?<=itemId:\s\")\d+", html)[0]
-            # dytk = re.findall(r"(?<=dytk:\s\")(.*?)(?=\")", html)[0]
         except IndexError:
             return Result.failed(res.reason)
 
@@ -65,21 +64,49 @@ class DouyinService(Service):
         if http_utils.is_error(url_res):
             return Result.error(url_res)
 
-        vhtml = str(url_res.text)
-        try:
-            uri = re.findall(r'(?<=\"uri\":\")\w{32}(?=\")', vhtml)[0]
-        except IndexError:
-            return Result.failed(url_res.reason)
-        if not uri:
-            return ErrorResult.VIDEO_ADDRESS_NOT_FOUNT
+        data = json.loads(str(url_res.text))
+        if not data['status_code'] == 0:
+            return Result.failed(data['status_msg'])
 
-        link = "https://aweme.snssdk.com/aweme/v1/play/?video_id=" + uri + \
-                "&line=0&ratio=540p&media_type=4&vr_type=0&improve_bitrate=0" \
-                "&is_play_url=1&is_support_h265=0&source=PackSourceEnum_PUBLISH"
-        result = Result.success(link)
+        item = data['item_list'][0]
+        if item['aweme_type'] == 4:
+            result = DouyinService.get_video(item)
+        elif item['aweme_type'] == 2:
+            result = DouyinService.get_image(item)
+        else:
+            return ErrorResult.VIDEO_ADDRESS_NOT_FOUNT
 
         if mode == 1:
             result.ref = res.url
+        return result
+
+    @staticmethod
+    def get_video(data) -> Result:
+        try:
+            vid = data['video']['vid']
+        except Exception as e:
+            return ErrorResult.VIDEO_ADDRESS_NOT_FOUNT
+
+        link = "https://aweme.snssdk.com/aweme/v1/play/?video_id=" + vid + \
+                "&line=0&ratio=540p&media_type=4&vr_type=0&improve_bitrate=0" \
+                "&is_play_url=1&is_support_h265=0&source=PackSourceEnum_PUBLISH"
+        return Result.success(link)
+
+    @staticmethod
+    def get_image(data) -> Result:
+        try:
+            images = data['images']
+        except Exception as e:
+            return ErrorResult.VIDEO_ADDRESS_NOT_FOUNT
+
+        list = []
+        for image in images:
+            urls = image['url_list']
+            url = urls[-1]
+            list.append(url)
+
+        result = Result.success(list)
+        result.type = 1
         return result
 
     @classmethod

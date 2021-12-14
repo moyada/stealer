@@ -6,12 +6,16 @@ class Result:
     def __init__(self, success: bool, data):
         self._success = success
         self._data = data
+        self._type = 0
 
     def is_success(self):
         return self._success
 
     def get_data(self):
         return self._data
+
+    def is_image(self):
+        return self._type != 0
 
     @property
     def ref(self):
@@ -20,6 +24,14 @@ class Result:
     @ref.setter
     def ref(self, value):
         self._ref = value
+
+    @property
+    def type(self):
+        return self._type
+
+    @type.setter
+    def type(self, value):
+        self._type = value
 
     @staticmethod
     def success(data):
