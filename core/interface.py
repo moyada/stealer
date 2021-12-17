@@ -67,9 +67,9 @@ class Service:
     def proxy_download(cls, vtype, url, header: dict, mode=1) -> HttpResponse:
         # 检查文件
         index = cls.index(url)
-        file = store.find(vtype, index)
+        file, filename = store.find(vtype, index)
         if file is not None:
-            return Service.stream(file, index)
+            return Service.stream(file, filename)
 
         result = cls.fetch(url, mode=mode)
         if not result.is_success():
@@ -91,11 +91,11 @@ class Service:
             store.save(vtype, res, index)
             res.close()
 
-        file = store.find(vtype, index)
-        return Service.stream(file, index)
+        file, filename = store.find(vtype, index)
+        return Service.stream(file, filename)
 
     @staticmethod
-    def stream(file, index) -> HttpResponse:
+    def stream(file, filename) -> HttpResponse:
         try:
             # 设置响应头
             # StreamingHttpResponse将文件内容进行流式传输，数据量大可以用这个方法
@@ -103,7 +103,9 @@ class Service:
             # 以流的形式下载文件,这样可以实现任意格式的文件下载
             response['Content-Type'] = 'application/octet-stream'
             # Content-Disposition就是当用户想把请求所得的内容存为一个文件的时候提供一个默认的文件名
-            response['Content-Disposition'] = 'attachment;filename="{}"'.format(index + '.mp4')
+            response['Content-Disposition'] = 'attachment;filename="{}"'.format(filename)
         except Exception as e:
             response = HttpResponse(e)
+        # finally:
+        #     file.close()
         return response
