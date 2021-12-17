@@ -1,3 +1,4 @@
+import io
 import os
 import logging
 import zipfile
@@ -14,15 +15,15 @@ logger = logging.getLogger(__name__)
 base_path = os.getcwd() + "/video/"
 
 
-def find(vtype: Video, index: str) -> object:
+def find(vtype: Video, index: str) -> (io.open, str):
     if index is None:
-        return None
+        return None, None
     filename = get_name(vtype, index)
     if os.path.exists(filename + ".mp4"):
-        return open(filename + ".mp4", 'rb')
+        return open(filename + ".mp4", 'rb'), index+".mp4"
     if os.path.exists(filename + ".zip"):
-        return open(filename + ".zip", 'rb')
-    return None
+        return open(filename + ".zip", 'rb'), index+".zip"
+    return None, None
 
 
 def get_name(vtype: Video, index: str) -> str:
@@ -54,5 +55,6 @@ def save_image(vtype: Video, images: List[str], index: str):
             if http_utils.is_error(res):
                 return HttpResponseServerError(str(res))
             # res.headers.get('content-type')
-        imgZip.writestr(f"{index}.jpg", res.content)
+            imgZip.writestr(f"{index}.jpg", res.content)
+            index += 1
     return None
