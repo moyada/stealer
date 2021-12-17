@@ -17,7 +17,7 @@ pip install django-cors-headers
 - 点击`下载`直接下载视频 (经过 md5 处理)
 - 点击`解析`获取下载地址
 
-[试用地址](https://tools.qysf.xyz/#/watermark) 
+[试用地址](http://119.23.110.20:8000/#/) 
 
 ### Docker 方式部署
 
