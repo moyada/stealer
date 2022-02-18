@@ -121,6 +121,36 @@
       }
 
       this.loading = true;
+
+      // const link = constant.host + 'video/download?type=' + this.selectedType + '&url=' + url
+      // let a = document.createElement('a');
+      // a.href = link;
+      // a.download = "file.jpg"; //图片名及格式
+      // document.body.appendChild(a);
+
+      // try {
+      //   a.click();
+      // } catch (e) {
+      //   console.log(e)
+      //   this.$message.error('视频下载失败, ' + e)
+      // } finally {
+      //   document.body.removeChild(a);
+      //   this.loading = false;
+      // }
+
+      // fetch(constant.host + 'video/download?type=' + this.selectedType + '&url=' + url)
+      //   .then(res => {
+      //     if (!res.ok) {
+      //       throw res.text()
+      //     }
+      //     this.loading = false;
+      //   })
+      //   .catch(err => {
+      //     this.loading = false;
+      //     err.then(text => this.$message.error('视频下载失败, ' + text))
+      //   }
+      // );
+
       fetch(constant.host + 'video/download?type=' + this.selectedType + '&url=' + url,{
           responseType: 'blob'
         })
@@ -140,29 +170,12 @@
             filename = null
             data = res.text()
           }
-          return ({data: data, filename: filename});
-        })
-        .then(({data, filename}) => {
-          if (filename !== null) {
-            data.then(data => {
+
+          data.then(data => {
               url = window.URL.createObjectURL(data);
               download(url, filename);
               window.URL.revokeObjectURL(url)
               this.loading = false;
-            });
-            return
-          }
-
-          data.then(text => {
-            const info = JSON.parse(text);
-            fetch(info['url'])
-              .then(res =>  res.blob())
-              .then(blob => {
-                url = window.URL.createObjectURL(blob);
-                download(url, info['name']);
-                window.URL.revokeObjectURL(url)
-                this.loading = false;
-              });
             });
         })
         .catch(err => {
