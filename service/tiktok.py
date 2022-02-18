@@ -77,7 +77,7 @@ class TiktokService(Service):
 
     @classmethod
     def download(cls, url, m=None) -> HttpResponse:
-        return cls.proxy_download(vtype, url, download_headers, m)
+        return cls.proxy_download(vtype, url, download_headers, ".mp4", m)
 
 
 if __name__ == '__main__':

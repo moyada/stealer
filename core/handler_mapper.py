@@ -12,6 +12,7 @@ service_mapper = {
     Video.HUOSHAN: huoshan.HuoshanService,
     Video.XIGUA: xigua.XiguaService,
     Video.PIPIXIA: pipixia.PipixiaService,
+    Video.BILIBILI: bilibili.BiliBiliService,
 }
 
 

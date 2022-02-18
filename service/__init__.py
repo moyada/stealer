@@ -4,4 +4,5 @@ from service import (
     huoshan,
     pipixia,
     xigua,
+    bilibili,
 )
