@@ -95,7 +95,7 @@ class PipixiaService(Service):
 
     @classmethod
     def download(cls, url) -> HttpResponse:
-        return cls.proxy_download(vtype, url, download_headers, mode=0)
+        return cls.proxy_download(vtype, url, download_headers, ".mp4", mode=0)
 
     @staticmethod
     def get_video(video: dict) -> Optional[str]:

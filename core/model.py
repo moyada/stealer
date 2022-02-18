@@ -6,6 +6,7 @@ class Result:
     def __init__(self, success: bool, data):
         self._success = success
         self._data = data
+        self._extra = ".mp4"
         self._type = 0
 
     def is_success(self):
@@ -32,6 +33,14 @@ class Result:
     @type.setter
     def type(self, value):
         self._type = value
+
+    @property
+    def extra(self):
+        return self._extra
+
+    @extra.setter
+    def extra(self, value):
+        self._extra = value
 
     @staticmethod
     def success(data):

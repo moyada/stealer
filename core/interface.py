@@ -64,10 +64,10 @@ class Service:
         return HttpResponseServerError(result.get_data())
 
     @classmethod
-    def proxy_download(cls, vtype, url, header: dict, mode=1) -> HttpResponse:
+    def proxy_download(cls, vtype, url, header: dict, extra: str, mode=1) -> HttpResponse:
         # 检查文件
         index = cls.index(url)
-        file, filename = store.find(vtype, index)
+        file, filename = store.find(vtype, index, extra)
         if file is not None:
             return Service.stream(file, filename)
 
@@ -88,10 +88,10 @@ class Service:
             if http_utils.is_error(res):
                 return HttpResponseServerError(str(res))
 
-            store.save(vtype, res, index)
+            store.save(vtype, res, index, result.extra)
             res.close()
 
-        file, filename = store.find(vtype, index)
+        file, filename = store.find(vtype, index, result.extra)
         return Service.stream(file, filename)
 
     @staticmethod

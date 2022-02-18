@@ -62,4 +62,4 @@ class XiguaService(Service):
 
     @classmethod
     def download(cls, url) -> HttpResponse:
-        return cls.proxy_download(vtype, url, download_headers)
+        return cls.proxy_download(vtype, url, download_headers, ".mp4")

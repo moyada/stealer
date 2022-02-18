@@ -73,6 +73,7 @@ class DouyinService(Service):
             result = DouyinService.get_video(item)
         elif item['aweme_type'] == 2:
             result = DouyinService.get_image(item)
+            result.extra = ".zip"
         else:
             return ErrorResult.VIDEO_ADDRESS_NOT_FOUNT
 
@@ -111,7 +112,7 @@ class DouyinService(Service):
 
     @classmethod
     def download(cls, url) -> HttpResponse:
-        return cls.proxy_download(vtype, url, download_headers)
+        return cls.proxy_download(vtype, url, download_headers, ".mp4")
 
 
 if __name__ == '__main__':

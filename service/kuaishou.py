@@ -65,9 +65,9 @@ class KuaishouService(Service):
             result.ref = res.url
         return result
 
-    # @classmethod
-    # def download(cls, url) -> HttpResponse:
-    #     return cls.proxy_download(vtype, url, download_headers)
+    @classmethod
+    def download(cls, url) -> HttpResponse:
+        return cls.proxy_download(vtype, url, download_headers, ".mp4")
 
 
 if __name__ == '__main__':
