@@ -16,13 +16,14 @@ headers = {
 }
 
 download_headers = {
-    "accept": "*/*",
-    "accept-encoding": "identity;q=1, *;q=0",
-    "host": "jsmov2.a.yximgs.com",
-    "range": "bytes=0-",
-    "sec-fetch-dest": "video",
-    "sec-fetch-mode": "no-cors",
-    "sec-fetch-site": "cross-sit",
+    "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
+    "accept-encoding": "gzip, deflate, br",
+    # "host": "txmov2.a.kwimgs.com",
+    # "range": "bytes=0-",
+    # "sec-fetch-dest": "video",
+    # "sec-fetch-mode": "no-cors",
+    # "sec-fetch-site": "cross-sit",
+    "Upgrade-Insecure-Requests": '1',
     "user-agent": config.user_agent
 }
 
@@ -37,11 +38,11 @@ class KuaishouService(Service):
 
     @classmethod
     def make_url(cls, index) -> str:
-        return 'http://v.kuaishou.com/' + index
+        return 'https://v.kuaishou.com/' + index
 
     @classmethod
-    def fetch(cls, url: str, mode=0) -> Result:
-        url = cls.get_url(url)
+    def fetch(cls, share_url: str, mode=0) -> Result:
+        url = cls.get_url(share_url)
         if url is None:
             return ErrorResult.URL_NOT_INCORRECT
 
@@ -62,7 +63,7 @@ class KuaishouService(Service):
         url = "https://" + url + ".mp4"
         result = Result.success(url)
         if mode != 0:
-            result.ref = res.url
+            result.ref = share_url
         return result
 
     @classmethod
@@ -71,5 +72,5 @@ class KuaishouService(Service):
 
 
 if __name__ == '__main__':
-    KuaishouService.fetch('http://v.kuaishou.com/3ke4p2')
+    KuaishouService.fetch('https://v.kuaishou.com/3ke4p2')
 
