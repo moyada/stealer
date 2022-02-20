@@ -1,4 +1,6 @@
 import re
+from typing import Optional
+
 from django.http import HttpResponse
 
 from core.interface import Service
@@ -33,21 +35,31 @@ vtype = Video.KUAISHOU
 class KuaishouService(Service):
 
     @classmethod
-    def get_prefix_pattern(cls) -> str:
-        return 'kuaishou\.com\/'
+    def get_url(cls, text: str) -> Optional[str]:
+        if "kuaishouapp" in text:
+            urls = re.findall(r'(?<=v.kuaishouapp.com\/s\/)\w+', text, re.I | re.M)
+        else:
+            urls = re.findall(r'(?<=v.kuaishou.com\/)\w+', text, re.I | re.M)
+
+        if urls:
+            return urls[0]
+        return None
 
     @classmethod
-    def make_url(cls, index) -> str:
-        return 'https://v.kuaishou.com/' + index
+    def index(cls, url) -> Optional[str]:
+        if "kuaishouapp" in url:
+            return re.findall(r'(?<=com\/s\/)\w+', url)[0]
+        else:
+            return re.findall(r'(?<=com\/)\w+', url)[0]
 
     @classmethod
     def fetch(cls, share_url: str, mode=0) -> Result:
-        url = cls.get_url(share_url)
-        if url is None:
-            return ErrorResult.URL_NOT_INCORRECT
+        # url = cls.get_url(share_url)
+        # if url is None:
+        #     return ErrorResult.URL_NOT_INCORRECT
 
         # 请求短链接，获得itemId和dytk
-        res = http_utils.get(url, header=headers)
+        res = http_utils.get(share_url, header=headers)
         if http_utils.is_error(res):
             return Result.error(res)
 
