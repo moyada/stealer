@@ -38,11 +38,13 @@ class KuaishouService(Service):
     def get_url(cls, text: str) -> Optional[str]:
         if "kuaishouapp" in text:
             urls = re.findall(r'(?<=v.kuaishouapp.com\/s\/)\w+', text, re.I | re.M)
+            if urls:
+                return "https://v.kuaishouapp.com/s/" + urls[0]
         else:
             urls = re.findall(r'(?<=v.kuaishou.com\/)\w+', text, re.I | re.M)
+            if urls:
+                return "https://v.kuaishou.com/" + urls[0]
 
-        if urls:
-            return urls[0]
         return None
 
     @classmethod
@@ -53,10 +55,10 @@ class KuaishouService(Service):
             return re.findall(r'(?<=com\/)\w+', url)[0]
 
     @classmethod
-    def fetch(cls, share_url: str, mode=0) -> Result:
-        # url = cls.get_url(share_url)
-        # if url is None:
-        #     return ErrorResult.URL_NOT_INCORRECT
+    def fetch(cls, url: str, mode=0) -> Result:
+        share_url = cls.get_url(url)
+        if share_url is None:
+             return ErrorResult.URL_NOT_INCORRECT
 
         # 请求短链接，获得itemId和dytk
         res = http_utils.get(share_url, header=headers)
