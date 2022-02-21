@@ -131,3 +131,4 @@ video/*/
 
 *.pid
 !appfront/build
+*.DS_Store
