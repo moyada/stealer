@@ -88,8 +88,13 @@ class DouyinService(Service):
         except Exception as e:
             return ErrorResult.VIDEO_ADDRESS_NOT_FOUNT
 
+        try:
+            ratio = data['video']['ratio']
+        except Exception as e:
+            ratio = "540p"
+
         link = "https://aweme.snssdk.com/aweme/v1/play/?video_id=" + vid + \
-                "&line=0&ratio=540p&media_type=4&vr_type=0&improve_bitrate=0" \
+                "&line=0&ratio="+ratio+"&media_type=4&vr_type=0&improve_bitrate=0" \
                 "&is_play_url=1&is_support_h265=0&source=PackSourceEnum_PUBLISH"
         return Result.success(link)
 
