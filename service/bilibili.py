@@ -42,8 +42,23 @@ vtype = Video.BILIBILI
 class BiliBiliService(Service):
 
     @classmethod
-    def get_prefix_pattern(cls) -> str:
-        return 'www\.bilibili\.com\/video\/'
+    def get_url(cls, text: str) -> Optional[str]:
+        if "bilibili" in text:
+            urls = re.findall(r'(?<=www\.bilibili\.com\/video\/).+', text, re.I | re.M)
+            if urls:
+                return "https://www.bilibili.com/video/" + urls[0]
+            return None
+
+        urls = re.findall(r'(?<=b23\.tv\/)\w+', text, re.I | re.M)
+        url = "https://b23.tv/" + urls[0]
+        res = http_utils.get(url, header=headers)
+        url = res.url
+        return url
+
+    # @classmethod
+    # def get_prefix_pattern(cls) -> str:
+    #     # https://b23.tv/lizymu4
+    #     return 'www\.bilibili\.com\/video\/'
 
     @classmethod
     def make_url(cls, index) -> str:
@@ -51,6 +66,9 @@ class BiliBiliService(Service):
 
     @classmethod
     def index(cls, url) -> Optional[str]:
+        if "b23.tv" in url:
+            return re.findall(r'(?<=b23\.tv\/)\w+', url, re.I | re.M)[0]
+
         try:
             bvid = re.findall(r'(?<=video\/)\w+', url)[0]
         except IndexError:
@@ -63,8 +81,19 @@ class BiliBiliService(Service):
             return bvid + '-' + p[0]
 
     @classmethod
+    def get_bvid(cls, url) -> Optional[str]:
+        try:
+            return re.findall(r'(?<=video\/)\w+', url)[0]
+        except IndexError:
+            return None
+
+    @classmethod
     def fetch(cls, url: str, mode=0) -> Result:
-        bvid = cls.get_url(url)
+        burl = cls.get_url(url)
+        if burl is None:
+            return ErrorResult.URL_NOT_INCORRECT
+
+        bvid = cls.get_bvid(burl)
         if bvid is None:
             return ErrorResult.URL_NOT_INCORRECT
 
