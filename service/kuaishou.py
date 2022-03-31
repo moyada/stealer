@@ -1,3 +1,4 @@
+import json
 import re
 from typing import Optional
 
@@ -67,17 +68,43 @@ class KuaishouService(Service):
 
         html = res.text
         try:
-            url = re.findall(r"(?<=\"srcNoMark\":\"https://)(.*?)(?=.mp4)", html)[0]
+            data = re.findall(r"(?<=window\.pageData= )(.*?)(?=<\/script>)", html)[0]
         except IndexError:
             return ErrorResult.VIDEO_ADDRESS_NOT_FOUNT
 
-        if not url:
-            return ErrorResult.VIDEO_ADDRESS_NOT_FOUNT
+        data = json.loads(data)
+        if data['video']['type'] == 'video':
+            result = KuaishouService.get_video(data)
+        else:
+            result = KuaishouService.get_image(data)
 
-        url = "https://" + url + ".mp4"
-        result = Result.success(url)
         if mode != 0:
             result.ref = share_url
+        return result
+
+    @staticmethod
+    def get_video(data) -> Result:
+        try:
+            url = data['video']['srcNoMark']
+        except Exception as e:
+            return ErrorResult.VIDEO_ADDRESS_NOT_FOUNT
+        return Result.success(url)
+
+    @staticmethod
+    def get_image(data) -> Result:
+        try:
+            host = 'https://' + data['video']['imageCDN']
+            images = data['video']['images']
+        except Exception as e:
+            return ErrorResult.VIDEO_ADDRESS_NOT_FOUNT
+
+        image_urls = []
+        for image in images:
+            url = host + image['path']
+            image_urls.append(url)
+
+        result = Result.success(image_urls)
+        result.type = 1
         return result
 
     @classmethod

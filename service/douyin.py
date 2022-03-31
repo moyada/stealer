@@ -105,13 +105,13 @@ class DouyinService(Service):
         except Exception as e:
             return ErrorResult.VIDEO_ADDRESS_NOT_FOUNT
 
-        list = []
+        image_urls = []
         for image in images:
             urls = image['url_list']
             url = urls[-1]
-            list.append(url)
+            image_urls.append(url)
 
-        result = Result.success(list)
+        result = Result.success(image_urls)
         result.type = 1
         return result
 

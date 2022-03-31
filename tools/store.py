@@ -22,7 +22,7 @@ def find(vtype: Video, index: str, extra: str) -> (io.open, str):
     if os.path.exists(filename + extra):
         return open(filename + extra, 'rb'), index+extra
 
-    if vtype == Video.DOUYIN and  os.path.exists(filename + ".zip"):
+    if (vtype == Video.DOUYIN or vtype == Video.KUAISHOU) and os.path.exists(filename + ".zip"):
         return open(filename + ".zip", 'rb'), index + ".zip"
     return None, None
 
