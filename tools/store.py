@@ -15,14 +15,15 @@ logger = logging.getLogger(__name__)
 base_path = os.getcwd() + "/video/"
 
 
-def find(vtype: Video, index: str) -> (io.open, str):
+def find(vtype: Video, index: str, extra: str) -> (io.open, str):
     if index is None:
         return None, None
     filename = get_name(vtype, index)
-    if os.path.exists(filename + ".mp4"):
-        return open(filename + ".mp4", 'rb'), index+".mp4"
-    if os.path.exists(filename + ".zip"):
-        return open(filename + ".zip", 'rb'), index+".zip"
+    if os.path.exists(filename + extra):
+        return open(filename + extra, 'rb'), index+extra
+
+    if (vtype == Video.DOUYIN or vtype == Video.KUAISHOU) and os.path.exists(filename + ".zip"):
+        return open(filename + ".zip", 'rb'), index + ".zip"
     return None, None
 
 
@@ -33,8 +34,8 @@ def get_name(vtype: Video, index: str) -> str:
     return base_path + vtype.value + "/" + index
 
 
-def save(vtype: Video, res: Response, index: str):
-    filename = get_name(vtype, index) + ".mp4"
+def save(vtype: Video, res: Response, index: str, extra: str):
+    filename = get_name(vtype, index) + extra
     with open(filename, 'wb')as file:
         file.write(res.content)
         file.close()

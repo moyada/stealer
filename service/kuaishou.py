@@ -1,4 +1,7 @@
+import json
 import re
+from typing import Optional
+
 from django.http import HttpResponse
 
 from core.interface import Service
@@ -16,13 +19,14 @@ headers = {
 }
 
 download_headers = {
-    "accept": "*/*",
-    "accept-encoding": "identity;q=1, *;q=0",
-    "host": "jsmov2.a.yximgs.com",
-    "range": "bytes=0-",
-    "sec-fetch-dest": "video",
-    "sec-fetch-mode": "no-cors",
-    "sec-fetch-site": "cross-sit",
+    "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
+    "accept-encoding": "gzip, deflate, br",
+    # "host": "txmov2.a.kwimgs.com",
+    # "range": "bytes=0-",
+    # "sec-fetch-dest": "video",
+    # "sec-fetch-mode": "no-cors",
+    # "sec-fetch-site": "cross-sit",
+    "Upgrade-Insecure-Requests": '1',
     "user-agent": config.user_agent
 }
 
@@ -32,44 +36,82 @@ vtype = Video.KUAISHOU
 class KuaishouService(Service):
 
     @classmethod
-    def get_prefix_pattern(cls) -> str:
-        return 'kuaishou\.com\/'
+    def get_url(cls, text: str) -> Optional[str]:
+        if "kuaishouapp" in text:
+            urls = re.findall(r'(?<=v.kuaishouapp.com\/s\/)\w+', text, re.I | re.M)
+            if urls:
+                return "https://v.kuaishouapp.com/s/" + urls[0]
+        else:
+            urls = re.findall(r'(?<=v.kuaishou.com\/)\w+', text, re.I | re.M)
+            if urls:
+                return "https://v.kuaishou.com/" + urls[0]
+
+        return None
 
     @classmethod
-    def make_url(cls, index) -> str:
-        return 'http://v.kuaishou.com/' + index
+    def index(cls, url) -> Optional[str]:
+        if "kuaishouapp" in url:
+            return re.findall(r'(?<=com\/s\/)\w+', url)[0]
+        else:
+            return re.findall(r'(?<=com\/)\w+', url)[0]
 
     @classmethod
     def fetch(cls, url: str, mode=0) -> Result:
-        url = cls.get_url(url)
-        if url is None:
-            return ErrorResult.URL_NOT_INCORRECT
+        share_url = cls.get_url(url)
+        if share_url is None:
+             return ErrorResult.URL_NOT_INCORRECT
 
         # 请求短链接，获得itemId和dytk
-        res = http_utils.get(url, header=headers)
+        res = http_utils.get(share_url, header=headers)
         if http_utils.is_error(res):
             return Result.error(res)
 
         html = res.text
         try:
-            url = re.findall(r"(?<=\"srcNoMark\":\"https://)(.*?)(?=.mp4)", html)[0]
+            data = re.findall(r"(?<=window\.pageData= )(.*?)(?=<\/script>)", html)[0]
         except IndexError:
             return ErrorResult.VIDEO_ADDRESS_NOT_FOUNT
 
-        if not url:
-            return ErrorResult.VIDEO_ADDRESS_NOT_FOUNT
+        data = json.loads(data)
+        if data['video']['type'] == 'video':
+            result = KuaishouService.get_video(data)
+        else:
+            result = KuaishouService.get_image(data)
 
-        url = "https://" + url + ".mp4"
-        result = Result.success(url)
         if mode != 0:
-            result.ref = res.url
+            result.ref = share_url
         return result
 
-    # @classmethod
-    # def download(cls, url) -> HttpResponse:
-    #     return cls.proxy_download(vtype, url, download_headers)
+    @staticmethod
+    def get_video(data) -> Result:
+        try:
+            url = data['video']['srcNoMark']
+        except Exception as e:
+            return ErrorResult.VIDEO_ADDRESS_NOT_FOUNT
+        return Result.success(url)
+
+    @staticmethod
+    def get_image(data) -> Result:
+        try:
+            host = 'https://' + data['video']['imageCDN']
+            images = data['video']['images']
+        except Exception as e:
+            return ErrorResult.VIDEO_ADDRESS_NOT_FOUNT
+
+        image_urls = []
+        for image in images:
+            url = host + image['path']
+            image_urls.append(url)
+
+        result = Result.success(image_urls)
+        result.type = 1
+        return result
+
+    @classmethod
+    def download(cls, url) -> HttpResponse:
+        return cls.proxy_download(vtype, url, download_headers, ".mp4")
 
 
 if __name__ == '__main__':
-    KuaishouService.fetch('http://v.kuaishou.com/3ke4p2')
+    KuaishouService.fetch('https://v.kuaishou.com/3ke4p2')
 

@@ -98,7 +98,7 @@ class HuoshanService(Service):
 
     @classmethod
     def download(cls, url) -> HttpResponse:
-        return cls.proxy_download(vtype, url, download_headers)
+        return cls.proxy_download(vtype, url, download_headers, ".mp4")
 
 
 if __name__ == '__main__':

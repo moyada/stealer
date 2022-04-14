@@ -48,7 +48,7 @@ class PipixiaService(Service):
 
     @classmethod
     def make_url(cls, index) -> str:
-        return 'http://h5.pipix.com/s/' + index
+        return 'https://h5.pipix.com/s/' + index
 
     @classmethod
     def index(cls, url) -> Optional[str]:
@@ -82,7 +82,7 @@ class PipixiaService(Service):
         data = json.loads(str(info_res.text))
 
         try:
-            video = data['data']['item']['comments'][0]['item']['video']
+            video = data['data']['item']['video']
             url = cls.get_video(video)
         except (KeyError, IndexError):
             return ErrorResult.VIDEO_ADDRESS_NOT_FOUNT
@@ -95,7 +95,7 @@ class PipixiaService(Service):
 
     @classmethod
     def download(cls, url) -> HttpResponse:
-        return cls.proxy_download(vtype, url, download_headers, mode=0)
+        return cls.proxy_download(vtype, url, download_headers, ".mp4", mode=0)
 
     @staticmethod
     def get_video(video: dict) -> Optional[str]:
@@ -105,8 +105,8 @@ class PipixiaService(Service):
             return video['video_mid']['url_list'][0]['url']
         if video['video_low'] is not None:
             return video['video_low']['url_list'][0]['url']
-        return None
+        return video['video_download']['url_list'][0]['url']
 
 
 if __name__ == '__main__':
-    PipixiaService.fetch('http://h5.pipix.com/s/3asShh')
+    PipixiaService.fetch('https://h5.pipix.com/s/3asShh')

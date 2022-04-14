@@ -73,6 +73,7 @@ class DouyinService(Service):
             result = DouyinService.get_video(item)
         elif item['aweme_type'] == 2:
             result = DouyinService.get_image(item)
+            result.extra = ".zip"
         else:
             return ErrorResult.VIDEO_ADDRESS_NOT_FOUNT
 
@@ -87,8 +88,13 @@ class DouyinService(Service):
         except Exception as e:
             return ErrorResult.VIDEO_ADDRESS_NOT_FOUNT
 
+        try:
+            ratio = data['video']['ratio']
+        except Exception as e:
+            ratio = "540p"
+
         link = "https://aweme.snssdk.com/aweme/v1/play/?video_id=" + vid + \
-                "&line=0&ratio=540p&media_type=4&vr_type=0&improve_bitrate=0" \
+                "&line=0&ratio="+ratio+"&media_type=4&vr_type=0&improve_bitrate=0" \
                 "&is_play_url=1&is_support_h265=0&source=PackSourceEnum_PUBLISH"
         return Result.success(link)
 
@@ -99,19 +105,19 @@ class DouyinService(Service):
         except Exception as e:
             return ErrorResult.VIDEO_ADDRESS_NOT_FOUNT
 
-        list = []
+        image_urls = []
         for image in images:
             urls = image['url_list']
             url = urls[-1]
-            list.append(url)
+            image_urls.append(url)
 
-        result = Result.success(list)
+        result = Result.success(image_urls)
         result.type = 1
         return result
 
     @classmethod
     def download(cls, url) -> HttpResponse:
-        return cls.proxy_download(vtype, url, download_headers)
+        return cls.proxy_download(vtype, url, download_headers, ".mp4")
 
 
 if __name__ == '__main__':
