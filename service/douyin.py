@@ -84,19 +84,22 @@ class DouyinService(Service):
     @staticmethod
     def get_video(data) -> Result:
         try:
-            vid = data['video']['vid']
+            # vid = data['video']['vid']
+            link = data['video']['play_addr']['url_list'][0]
+            link = link.replace('playwm','play')
+            return Result.success(link)
         except Exception as e:
             return ErrorResult.VIDEO_ADDRESS_NOT_FOUNT
 
-        try:
-            ratio = data['video']['ratio']
-        except Exception as e:
-            ratio = "540p"
-
-        link = "https://aweme.snssdk.com/aweme/v1/play/?video_id=" + vid + \
-                "&line=0&ratio="+ratio+"&media_type=4&vr_type=0&improve_bitrate=0" \
-                "&is_play_url=1&is_support_h265=0&source=PackSourceEnum_PUBLISH"
-        return Result.success(link)
+        # try:
+        #     ratio = data['video']['ratio']
+        # except Exception as e:
+        #     ratio = "540p"
+        #
+        # link = "https://aweme.snssdk.com/aweme/v1/play/?video_id=" + vid + \
+        #         "&line=0&ratio="+ratio+"&media_type=4&vr_type=0&improve_bitrate=0" \
+        #         "&is_play_url=1&is_support_h265=0&source=PackSourceEnum_PUBLISH"
+        # return Result.success(link)
 
     @staticmethod
     def get_image(data) -> Result:
@@ -122,3 +125,4 @@ class DouyinService(Service):
 
 if __name__ == '__main__':
     DouyinService.fetch('https://v.douyin.com/cCBrrq/')
+
