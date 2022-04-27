@@ -25,3 +25,13 @@ pip install django-cors-headers
 1. 构建镜像，拉取镜像 `docker pull xueyikang/stealer:1.1.0`
 2. 给拉取的镜像打tag `docker tag xueyikang/stealer:1.1.0 stealer:1.1.0` 
 3. 启动容器，执行命令 `docker run -d -p 8000:8000 stealer:1.1.0`, 应用地址为：127.0.0.1:8000
+
+
+### 直接使用最新的镜像
+
+```bash
+docker pull xueyikang/stealer
+docker run -itd --name stealer -p 8000:8000 xueyikang/stealer
+```
+
+### 
