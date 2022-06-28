@@ -12,6 +12,7 @@ class Video(Enum):
     XIGUA = ' 西瓜视频', 'xigua', False
     PIPIXIA = '皮皮虾', 'pipixia', True
     BILIBILI = '哔哩哔哩', 'bilibili', True
+    BANGUMI = '哔哩哔哩番剧', 'bangumi', True
 
     def __new__(cls, *value):
         obj = object.__new__(cls)

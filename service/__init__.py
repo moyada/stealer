@@ -5,4 +5,5 @@ from service import (
     pipixia,
     xigua,
     bilibili,
+    bangumi,
 )
