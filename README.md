@@ -26,4 +26,4 @@ pip install django-cors-headers
 ### Docker 方式部署
 
 1. 构建镜像，拉取镜像 `docker pull xueyikang/stealer` 
-2启动容器，执行命令 `docker run -d -p 8000:8000 stealer`, 应用地址为：127.0.0.1:8000
+2. 启动容器，执行命令 `docker run -d -p 8000:8000 stealer`, 应用地址为：127.0.0.1:8000
