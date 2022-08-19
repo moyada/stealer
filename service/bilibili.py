@@ -50,6 +50,8 @@ class BiliBiliService(Service):
             return None
 
         urls = re.findall(r'(?<=b23\.tv\/)\w+', text, re.I | re.M)
+        if len(urls) == 0:
+            return None
         url = "https://b23.tv/" + urls[0]
         res = http_utils.get(url, header=headers)
         url = res.url
