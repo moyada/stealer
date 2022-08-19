@@ -85,7 +85,7 @@
       this.selectedType = value
     },
     fetch() {
-      let url = this.inputUrl.trim();
+      var url = this.inputUrl.trim();
       if (url === '') {
         this.$message({
           message: '分享地址不能为空',
@@ -94,6 +94,7 @@
         return
       }
       this.loading = true;
+      url = url.replaceAll('#', '')
 
       this.$axios.get(constant.host + 'video/fetch?type=' + this.selectedType + '&url=' + url)
         .then((res) => {
@@ -111,7 +112,7 @@
         })
     },
     download() {
-      let url = this.inputUrl.trim();
+      var url = this.inputUrl.trim();
       if (url === '') {
         this.$message({
           message: '分享地址不能为空',
@@ -120,6 +121,7 @@
         return
       }
 
+      url = url.replaceAll('#', '')
       this.loading = true;
 
       // const link = constant.host + 'video/download?type=' + this.selectedType + '&url=' + url
