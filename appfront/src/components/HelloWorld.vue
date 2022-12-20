@@ -44,7 +44,8 @@
   import constant from "./constant";
 
   function download(url, filename = '')  {
-    const link = document.createElement('a');
+    console.log('download')
+    var link = document.createElement('a');
     link.style.display = 'none';
     link.href = url;
     link.setAttribute('download', filename);
@@ -95,6 +96,7 @@
       }
       this.loading = true;
       url = url.replaceAll('#', '')
+      url = url.replaceAll('&', '')
 
       this.$axios.get(constant.host + 'video/fetch?type=' + this.selectedType + '&url=' + url)
         .then((res) => {
@@ -106,10 +108,11 @@
             this.downloadAddr = '';
           }
         }).catch((err) => {
-            this.loading = false;
             this.$message.error('地址分析失败, ' + this.getErrData(err));
             this.downloadAddr = '';
-        })
+        }).finally(() => {
+            this.loading = false;
+        });
     },
     download() {
       var url = this.inputUrl.trim();
@@ -122,43 +125,21 @@
       }
 
       url = url.replaceAll('#', '')
+      url = url.replaceAll('&', '')
+
       this.loading = true;
 
-      // const link = constant.host + 'video/download?type=' + this.selectedType + '&url=' + url
-      // let a = document.createElement('a');
-      // a.href = link;
-      // a.download = "file.jpg"; //图片名及格式
-      // document.body.appendChild(a);
-
-      // try {
-      //   a.click();
-      // } catch (e) {
-      //   console.log(e)
-      //   this.$message.error('视频下载失败, ' + e)
-      // } finally {
-      //   document.body.removeChild(a);
-      //   this.loading = false;
-      // }
-
-      // fetch(constant.host + 'video/download?type=' + this.selectedType + '&url=' + url)
-      //   .then(res => {
-      //     if (!res.ok) {
-      //       throw res.text()
-      //     }
-      //     this.loading = false;
-      //   })
-      //   .catch(err => {
-      //     this.loading = false;
-      //     err.then(text => this.$message.error('视频下载失败, ' + text))
-      //   }
-      // );
+      window.open(constant.host + 'video/download?type=' + this.selectedType + '&url=' + url, '_self')
+      this.loading = false;
+      return
 
       fetch(constant.host + 'video/download?type=' + this.selectedType + '&url=' + url,{
+          method: 'get',
           responseType: 'blob'
         })
         .then(res => {
           if (!res.ok) {
-            throw res.text()
+            throw new Error(res.text());
           }
 
           let filename = res.headers.get('content-disposition');
@@ -173,8 +154,8 @@
             data = res.text()
           }
 
-          data.then(data => {
-              url = window.URL.createObjectURL(data);
+          data.then(d => {
+              let url = window.URL.createObjectURL(d);
               download(url, filename);
               window.URL.revokeObjectURL(url)
               this.loading = false;
