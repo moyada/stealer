@@ -1,5 +1,3 @@
-# 杭州小伙伴请注意绕开此人公司 https://github.com/songxigang/HangzhouBlack
-
 抖音、快手、皮皮虾、火山视频。。。去水印程序 
 
 > 这个项目最早是我玩Tiktok自己方便自己做的搬运工具，本身我也没写过几个python，所以现在的项目结构已经挺乱的了。
@@ -15,6 +13,8 @@ pip install requests
 pip install enum34
 pip install django-cors-headers
 ```
+
+> 配置 `core/config.py`，配置 快手cookie 与 bilibili cookie。
 
 下载解压完运行 `start.sh` 或 `run.sh`，通过浏览器打开 [localhost:8000](http://localhost:8000) 进入使用页面。
 

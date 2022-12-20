@@ -22,31 +22,31 @@ def is_error(obj: Union[Optional[Response], Exception]) -> bool:
     return not hasattr(obj, 'status_code')
 
 
-def get(url, param=None, header=None) -> Union[Optional[Response], Exception]:
-    return execute(url, param, header)
+def get(url, param=None, header=None, redirect=True) -> Union[Optional[Response], Exception]:
+    return execute(url, param, header, 1, redirect)
 
 
-def post(url, param=None, header=None) -> Union[Optional[Response], Exception]:
-    return execute(url, param, header, 2)
+def post(url, param=None, header=None, redirect=True) -> Union[Optional[Response], Exception]:
+    return execute(url, param, header, 2, redirect)
 
 
-def execute(url, param, header, mode=1) -> Union[Optional[Response], Exception]:
+def execute(url, param, header, mode=1, allow_redirects=True) -> Union[Optional[Response], Exception]:
     if param is None:
         param = {}
     if header is None:
         header = {'Content-Type': 'application/json'}
 
-    header['Connection'] = 'Close'
+    # header['Connection'] = 'Close'
 
     try:
         if mode == 1:
-            resp = requests.get(url, headers=header, params=param, timeout=20)
+            resp = requests.get(url, headers=header, params=param, timeout=20, allow_redirects=allow_redirects)
         else:
-            resp = requests.post(url, headers=header, data=param, timeout=20)
+            resp = requests.post(url, headers=header, json=param, timeout=20, allow_redirects=allow_redirects)
     except Exception as e:
         return e
 
-    success = (resp.status_code / 400) < 1
+    success = (resp.status_code < 400)
     if success:
         return resp
 
