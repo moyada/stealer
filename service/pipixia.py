@@ -90,7 +90,7 @@ class PipixiaService(Service):
         return Result.success(url)
 
     @staticmethod
-    def download_header():
+    def download_header() -> dict:
         return download_headers
 
     @classmethod

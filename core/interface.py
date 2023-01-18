@@ -35,6 +35,15 @@ class Service:
             return None
 
     @classmethod
+    def get_info(cls, url: str) -> Result:
+        """
+        获取作品信息
+        :param url:
+        :return:
+        """
+        pass
+
+    @classmethod
     def fetch(cls, url: str, mode=0) -> Result:
         """
         获取视频地址
@@ -45,7 +54,7 @@ class Service:
         pass
 
     @staticmethod
-    def download_header():
+    def download_header() -> dict:
         pass
 
     @classmethod
@@ -93,6 +102,7 @@ class Service:
 
         file, filename = store.find(vtype, index, result.extra)
         return Service.stream(file, filename)
+
 
     @staticmethod
     def stream(file, filename) -> HttpResponse:
