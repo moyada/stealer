@@ -102,7 +102,7 @@ class BangumiService(Service):
         if http_utils.is_error(res):
             return Result.error(res)
 
-        data = json.loads(str(res.text))
+        data = json.loads(res.content)
 
         try:
             url = data['data']['durl'][0]['url']
