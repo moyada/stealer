@@ -24,7 +24,7 @@ urlpatterns = [
     path('', TemplateView.as_view(template_name="index.html"), name='index'),
     # path('', index.index, name='index'),
     path('ip/', apis.ip, name='ip'),
-    path('video/', include('core.urls'), name='video_type'),
+    path('video/', include('core.urls'), name='video'),
 ]
 
 # urlpatterns.extend([path(item.value + '/', include('route.' + item.value + '.urls'))

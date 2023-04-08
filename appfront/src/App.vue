@@ -1,9 +1,9 @@
 <template>
   <div id="app">
-    <img src="./assets/logo.png" width="200" height="200">
+    <!--        <img src="./assets/logo.png" width="200" height="200">
     <div style="margin-bottom: 20px">
       无水印视频下载
-    </div>
+    </div> -->
     <router-view/>
     <div style="position:fixed; bottom: 5px; text-align: right">
       <el-link href="https://github.com/moyada/stealer/issues"
