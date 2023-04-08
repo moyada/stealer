@@ -71,12 +71,13 @@ class DouyinService(Service):
             return ErrorResult.URL_NOT_INCORRECT
 
         # 请求短链接，获得itemId
-        res = http_utils.get(share_url, header=headers, redirect=False)
+        res = http_utils.get(share_url, header=headers, redirect=True)
         if http_utils.is_error(res):
             return ErrorResult.VIDEO_INFO_NOT_FOUNT
 
         try:
-            item_id = re.findall(r"(?<=video/)\d+", res.headers['location'])[0]
+            # item_id = re.findall(r"(?<=video/)\d+", res.headers['location'])[0]
+            item_id = re.findall(r"(?<=\w/)\d+", res.url)[0]
         except IndexError:
             return ErrorResult.VIDEO_INFO_NOT_FOUNT
 
@@ -121,19 +122,20 @@ class DouyinService(Service):
         url = cls.get_url(url)
         if url is None:
             return ErrorResult.URL_NOT_INCORRECT
-
+        print(url)
         # 请求短链接，获得itemId
         res = http_utils.get(url, header=headers)
         if http_utils.is_error(res):
             return Result.error(res)
 
         try:
-            item_id = re.findall(r"(?<=video/)\d+", res.url)[0]
+            item_id = re.findall(r"(?<=(\w)/)\d+", res.url)[0]
         except IndexError:
             return Result.failed(res.reason)
 
         # 组装视频长链接
         infourl = "https://www.iesdouyin.com/web/api/v2/aweme/iteminfo/?item_ids=" + item_id + "&dytk="# + dytk
+        print(infourl)
 
         # 请求长链接，获取play_addr
         url_res = http_utils.get(infourl, header=headers)
@@ -144,6 +146,7 @@ class DouyinService(Service):
         if not data['status_code'] == 0:
             return Result.failed(data['status_msg'])
 
+        print(data['item_list'])
         item = data['item_list'][0]
         if item['aweme_type'] == 4:
             result = Result.success(DouyinService.get_video(item))
