@@ -1,4 +1,41 @@
+import time
 from enum import unique, Enum
+
+from core.type import Video
+
+
+class Info:
+    def __init__(self, platform: Video):
+        self.expired = int(time.time())+10 * 60
+        self.platform = platform
+        self.filename = None
+        self.cover = ''
+        self.desc = ''
+        self.video = ''
+        self.images = []
+
+    @property
+    def ref(self):
+        return self.desc
+
+    @ref.setter
+    def ref(self, value):
+        self.desc = value
+
+    @property
+    def ref(self):
+        return self.cover
+
+    @ref.setter
+    def ref(self, value):
+        self.cover = value
+
+    def to_dict(self) -> dict:
+        _dict = {
+            'cover': self.cover,
+            'desc': self.desc,
+        }
+        return _dict
 
 
 class Result:
@@ -61,8 +98,10 @@ class ErrorResult(Result, Enum):
     URL_NOT_PRESENT = False, 'url is not present.'
     TYPE_NOT_PRESENT = False, 'type is not present.'
     MAPPER_NOT_EXIST = False, 'type mapper not exist.'
-    URL_NOT_INCORRECT = False, '分享地址有误.'
-    VIDEO_ADDRESS_NOT_FOUNT = False, '视频地址获取失败.'
+    URL_NOT_INCORRECT = False, '分享地址有误'
+    VIDEO_INFO_ERROR = False, '作品信息错误'
+    VIDEO_INFO_NOT_FOUNT = False, '作品获取失败'
+    VIDEO_ADDRESS_NOT_FOUNT = False, '视频地址获取失败'
 
     def __init__(self, *value):
         super(self.__class__, self).__init__(success=value[0], data=value[1])

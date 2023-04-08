@@ -1,13 +1,13 @@
 import json
 import logging
 import re
-from typing import Optional, Union
+from typing import Optional, Union, List
 
 from django.http import HttpResponse
 from requests import Response
 
 from core.interface import Service
-from core.model import Result, ErrorResult
+from core.model import Result, ErrorResult, Info
 from tools import http_utils
 from core import config
 from core.type import Video
@@ -52,6 +52,7 @@ download_headers = {
 
 vtype = Video.KUAISHOU
 
+
 class KuaishouService(Service):
 
     @classmethod
@@ -82,6 +83,52 @@ class KuaishouService(Service):
             return re.findall(r'(?<=com\/[s|f]\/)[\w|-]+', url)[0]
 
     @classmethod
+    def get_info(cls, url: str) -> Result:
+        share_url = cls.get_url(url)
+        if share_url is None:
+            return ErrorResult.URL_NOT_INCORRECT
+
+        logger.info('get video param')
+        h = desk_headers if "www.kuaishou.com" in share_url else app_headers
+        res = http_utils.get(share_url, param=None, header=h, redirect=False)
+        if http_utils.is_error(res):
+            return ErrorResult.VIDEO_INFO_ERROR
+
+        ref = res.headers['location']
+
+        logger.info('find video info')
+
+        if "chenzhongtech" in ref:
+            res, photo_id = cls.get_app_info(ref)
+        elif "gifshow" in ref:
+            photo_id = re.findall(r'(?<=photo\/)\w+', ref)[0]
+            res = cls.get_desk_info(photo_id, ref)
+        else:
+            photo_id = re.findall(r'(?<=short-video\/)\w+', ref)[0]
+            ref = ref.replace('/short-video', 'https://m.gifshow.com/fw/photo')
+            res = cls.get_desk_info(photo_id, ref)
+
+        if http_utils.is_error(res):
+            return ErrorResult.VIDEO_INFO_NOT_FOUNT
+
+        data = json.loads(res.content)
+
+        if data['result'] != 1:
+            return Result.failed(data['error_msg'])
+
+        info = Info(platform=vtype)
+        if data.get('atlas', None) is None:
+            info.filename = photo_id + '.mp4'
+            info.video = KuaishouService.get_video(data)
+        else:
+            info.filename = photo_id + '.zip'
+            info.images = KuaishouService.get_image(data)
+        info.desc = KuaishouService.get_desc(data)
+        info.cover = KuaishouService.get_cover(data)
+
+        return Result.success(info)
+
+    @classmethod
     def fetch(cls, url: str, mode=0) -> Result:
         share_url = cls.get_url(url)
         if share_url is None:
@@ -95,7 +142,7 @@ class KuaishouService(Service):
         ref = res.headers['location']
 
         if "chenzhongtech" in ref:
-            res = cls.get_app_info(ref)
+            res, photo_id = cls.get_app_info(ref)
         elif "gifshow" in ref:
             photo_id = re.findall(r'(?<=photo\/)\w+', ref)[0]
             res = cls.get_desk_info(photo_id, ref)
@@ -110,9 +157,10 @@ class KuaishouService(Service):
         data = json.loads(res.content)
 
         if data.get('atlas', None) is None:
-            result = KuaishouService.get_video(data)
+            result = Result.success(KuaishouService.get_video(data))
         else:
-            result = KuaishouService.get_image(data)
+            result = Result.success(KuaishouService.get_image(data))
+            result.type = 1
 
         if mode != 0:
             result.ref = share_url
@@ -151,7 +199,7 @@ class KuaishouService(Service):
 
 
     @staticmethod
-    def get_app_info(ref) -> Union[Optional[Response], Exception]:
+    def get_app_info(ref) -> (Union[Optional[Response], Exception], str):
         info_headers = {
             "Host": "v.m.chenzhongtech.com",
             "Origin": "https://v.m.chenzhongtech.com",
@@ -183,32 +231,36 @@ class KuaishouService(Service):
         }
 
         return http_utils.post("https://v.m.chenzhongtech.com/rest/wd/photo/info?kpn=KUAISHOU&captchaToken=",
-                              param=params, header=info_headers)
+                              param=params, header=info_headers), query.get('photoId')
+
 
     @staticmethod
-    def get_video(data) -> Result:
-        try:
-            url = data['photo']['mainMvUrls'][0]['url']
-        except Exception as e:
-            return ErrorResult.VIDEO_ADDRESS_NOT_FOUNT
-        return Result.success(url)
+    def get_cover(data) -> str:
+        return data['photo']['coverUrls'][0]['url']
 
     @staticmethod
-    def get_image(data) -> Result:
-        try:
-            host = 'https://' + data['atlas']['cdn'][0]
-            images = data['atlas']['list']
-        except Exception as e:
-            return ErrorResult.VIDEO_ADDRESS_NOT_FOUNT
+    def get_desc(data) -> str:
+        return data['photo']['caption']
+
+    @staticmethod
+    def get_video(data) -> str:
+        return data['photo']['mainMvUrls'][0]['url']
+
+    @staticmethod
+    def get_image(data) -> List[str]:
+        host = 'https://' + data['atlas']['cdn'][0]
+        images = data['atlas']['list']
 
         image_urls = []
         for image in images:
             url = host + image
             image_urls.append(url)
 
-        result = Result.success(image_urls)
-        result.type = 1
-        return result
+        return image_urls
+
+    @staticmethod
+    def download_header() -> dict:
+        return download_headers
 
     @classmethod
     def download(cls, url) -> HttpResponse:
