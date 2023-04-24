@@ -22,7 +22,7 @@ def get_token(vtype: Video, url: str) -> str:
 def make_path(sub: str, index: str) -> str:
     path = config.base_path + sub
     if not os.path.exists(path):
-        os.mkdir(path)
+        os.makedirs(path)
     return config.base_path + sub + "/" + index
 
 
