@@ -22,7 +22,9 @@ def download(info: Info) -> HttpResponse:
         return make_stream_response(file, info.filename)
 
     service = handler_mapper.get_service(info.platform)
-    if info.video != '':
+    if info.extra is not None:
+        service.complex_download(info)
+    elif info.video != '':
         res = http_utils.get(url=info.video, header=service.download_header())
         if http_utils.is_error(res):
             return HttpResponseServerError(str(res))

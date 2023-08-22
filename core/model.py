@@ -13,6 +13,7 @@ class Info:
         self.desc = ''
         self.video = ''
         self.images = []
+        self.extra = None
 
     @property
     def ref(self):
@@ -36,6 +37,28 @@ class Info:
             'desc': self.desc,
         }
         return _dict
+
+
+class Extra:
+    def __init__(self, videos: any, audios: any):
+        self.videos = videos
+        self.audios = audios
+
+    @property
+    def ref(self):
+        return self.videos
+
+    @ref.setter
+    def ref(self, value):
+        self.videos = value
+
+    @property
+    def ref(self):
+        return self.audios
+
+    @ref.setter
+    def ref(self, value):
+        self.audios = value
 
 
 class Result:

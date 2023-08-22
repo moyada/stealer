@@ -5,7 +5,7 @@ from typing import Optional
 
 from django.http import HttpResponse, FileResponse, HttpResponseServerError
 
-from core.model import Result
+from core.model import Result, Info
 from tools import store, http_utils
 
 
@@ -44,6 +44,7 @@ class Service:
         pass
 
     @classmethod
+    # deprecate
     def fetch(cls, url: str, mode=0) -> Result:
         """
         获取视频地址
@@ -103,6 +104,9 @@ class Service:
         file, filename = store.find(vtype, index, result.extra)
         return Service.stream(file, filename)
 
+    @classmethod
+    def complex_download(cls, info: Info):
+        pass
 
     @staticmethod
     def stream(file, filename) -> HttpResponse:
