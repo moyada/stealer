@@ -49,7 +49,7 @@ def find(vtype: Video, index: str, extra: str) -> (io.open, str):
 
     if (vtype == Video.DOUYIN or vtype == Video.KUAISHOU) and os.path.exists(filename + ".zip"):
         return open(filename + ".zip", 'rb'), index + ".zip"
-    return None, None
+    return None, filename
 
 
 def save_image(vtype: Video, images: List[str], filename: str):
@@ -65,14 +65,15 @@ def save_image(vtype: Video, images: List[str], filename: str):
             index = index + 1
 
 
-def save(vtype: Video, res: Response, index: str, extra: str):
+def save(vtype: Video, res: Response, index: str, extra: str) -> str:
     filename = make_path(vtype.value, index) + extra
     with open(filename, 'wb') as file:
         file.write(res.content)
         file.close()
 
-    if system.is_mac():
-        command = 'md5 -q'
-    else:
-        command = 'md5sum'
-    logger.info(terminal.run_cmd('sh video/remd5.sh {} {}'.format(command, filename)))
+    return filename
+    # if system.is_mac():
+    #     command = 'md5 -q'
+    # else:
+    #     command = 'md5sum'
+    # logger.info(terminal.run_cmd('sh video/remd5.sh {} {}'.format(command, filename)))

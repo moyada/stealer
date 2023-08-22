@@ -1,15 +1,17 @@
 import json
+import os
 import re
 from typing import Optional
 
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseServerError
 
+import tools.ffmpeg
 from core.interface import Service
-from core.model import Result, ErrorResult, Info
-from tools import http_utils
+from core.model import Result, ErrorResult, Info, Extra
+from tools import http_utils, store
 from core import config
 from core.type import Video
-
+from tools.store import make_path
 
 headers = {
     "accept": "*/*",
@@ -32,10 +34,16 @@ web_headers = {
 }
 
 user_headers = {
-    "accept": "*/*",
-    "content-type": "json",
-    "cookie": config.bilibili_cookie,
-    "user-agent": config.user_agent
+    "Accept": "json",
+    "Sec-Ch-Ua": "\"Not?A_Brand\";v=\"8\", \"Chromium\";v=\"108\", \"Google Chrome\";v=\"108\"",
+    "Sec-Ch-Ua-mobile": "?0",
+    "Sec-Ch-Ua-Platform": "\"macOS\"",
+    "Sec-Fetch-Dest": "empty",
+    "Sec-Fetch-Mode": "cors",
+    "Sec-Fetch-Site": "same-site",
+    "Origin": "https://www.bilibili.com",
+    "Cookie": config.bilibili_cookie,
+    "User-Agent": config.web_user_agent
 }
 
 download_headers = {
@@ -135,32 +143,27 @@ class BiliBiliService(Service):
         except (KeyError, IndexError):
             return ErrorResult.VIDEO_ADDRESS_NOT_FOUNT
 
-        # http://api.bilibili.com/x/player/playurl?cid=227539569&bvid=BV1cD4y1m7ce&qn=112&fnval=16
-        res = http_utils.get('http://api.bilibili.com/x/player/playurl',
-                             param={
-                                 'cid': cid,
-                                 'bvid': bvid,
-                                 'qn': 112,
-                                 'fnval': 0,
-                                 'fnver': 0,
-                                 'fourk': 1,
-                            }, header=user_headers)
-        if http_utils.is_error(res):
-            return Result.error(res)
+        res = http_utils.get(url, header=user_headers)
+        result = re.findall(r'(?<=<script>window.__playinfo__=).*(?=</script><script>)', res.text)
+        data = json.loads(result[0])
 
-        data = json.loads(res.content)
-
+        extra = None
         try:
-            url = data['data']['durl'][0]['url']
-            # url = data['data']['dash']['video'][0]['baseUrl']
+            videos = [video for video in data['data']['dash']['video']]
+            audios = [audio for audio in data['data']['dash']['audio']]
+            extra = Extra(videos=videos, audios=audios)
         except (KeyError, IndexError):
-            return ErrorResult.VIDEO_ADDRESS_NOT_FOUNT
+            try:
+                url = data['data']['durl'][0]['url']
+            except (KeyError, IndexError):
+                return ErrorResult.VIDEO_ADDRESS_NOT_FOUNT
 
         info = Info(platform=vtype)
-        info.filename = str(cid) + ".flv"
+        info.filename = str(cid) + ".mp4"
         info.cover = video_data['pic']
         info.desc = video_data['title']
         info.video = url
+        info.extra = extra
         return Result.success(info)
 
     @staticmethod
@@ -171,6 +174,31 @@ class BiliBiliService(Service):
 
     @classmethod
     def fetch(cls, url: str, mode=0) -> Result:
+        res = http_utils.get(url, header=user_headers)
+        result = re.findall(r'(?<=<script>window.__playinfo__=).*(?=</script><script>)', res.text)
+        data = json.loads(result[0])
+
+        videos, audios = [], []
+        try:
+            videos = [video['baseUrl'] for video in data['data']['dash']['video']]
+            audios = [audio['baseUrl'] for audio in data['data']['dash']['audio']]
+        except (KeyError, IndexError):
+            try:
+                url = data['data']['durl'][0]['url']
+            except (KeyError, IndexError):
+                return ErrorResult.VIDEO_ADDRESS_NOT_FOUNT
+
+        result = Result.success(url)
+        result.videos = videos
+        result.audios = audios
+        return result
+
+    @classmethod
+    def fetch2(cls, url: str, mode=0) -> Result:
+        res = http_utils.get(url, header=user_headers)
+        d = re.findall(r'(?<=<script>window.__playinfo__=).*(?=</script><script>)', res.text)
+        s = json.loads(d[0])
+
         burl = cls.get_url(url)
         if burl is None:
             return ErrorResult.URL_NOT_INCORRECT
@@ -196,15 +224,25 @@ class BiliBiliService(Service):
         except (KeyError, IndexError):
             return ErrorResult.VIDEO_ADDRESS_NOT_FOUNT
 
+        # entropy = 'rbMCKn@KuamXWlPMoJGsKcbiJKUfkPF_8dABscJntvqhRSETg'
+        # appkey, sec = ''.join([chr(ord(i) + 2) for i in entropy[::-1]]).split(':')
+
         # http://api.bilibili.com/x/player/playurl?cid=227539569&bvid=BV1cD4y1m7ce&qn=112&fnval=16
+        user_headers["Referer"] = "https://www.bilibili.com/video/BV1k24y1N7iu/?vd_source=d1510af6049ae3ed0ea10a6707f1ca06"
         res = http_utils.get('http://api.bilibili.com/x/player/playurl',
                              param={
+                                 'avid': 784013416,
                                  'cid': cid,
                                  'bvid': bvid,
-                                 'qn': 112,
-                                 'fnval': 0,
+                                 'qn': 127,
+                                 'otype': 'json',
                                  'fnver': 0,
+                                 'fnval': 4048,
                                  'fourk': 1,
+                                 'gaia_source': '',
+                                 'session': '2c2c6001d63d264212881628596e54d3',
+                                 'w_rid': '5079feced341071890a0fb066ef93e66',
+                                 'wts': 1685364777,
                             }, header=user_headers)
         if http_utils.is_error(res):
             return Result.error(res)
@@ -212,14 +250,21 @@ class BiliBiliService(Service):
         data = json.loads(res.content)
 
         try:
-            url = data['data']['durl'][0]['url']
-            # url = data['data']['dash']['video'][0]['baseUrl']
+            videos = [video['baseUrl'] for video in data['data']['dash']['video']]
+            audios = [audio['baseUrl'] for audio in data['data']['dash']['audio']]
+            url = {
+                videos: videos,
+                audios: audios,
+            }
         except (KeyError, IndexError):
-            return ErrorResult.VIDEO_ADDRESS_NOT_FOUNT
+            try:
+                url = data['data']['durl'][0]['url']
+            except (KeyError, IndexError):
+                return ErrorResult.VIDEO_ADDRESS_NOT_FOUNT
 
         result = Result.success(url)
-        if mode != 0:
-            result.ref = res.url
+        # result.videos = videos
+        # result.audios = audios
         return result
 
     @staticmethod
@@ -230,9 +275,46 @@ class BiliBiliService(Service):
     def download(cls, url) -> HttpResponse:
         return cls.proxy_download(vtype, url, download_headers, ".mp4", mode=0)
 
+    @classmethod
+    def complex_download(cls, info: Info):
+        index = info.filename.split('.')[0]
+        video_url, audio_url = "", ""
+
+        qn = 0
+        for v in info.extra.videos:
+            if v['bandwidth'] <= qn:
+                continue
+            video_url = v['baseUrl']
+            qn = v['bandwidth']
+
+        qn = 0
+        for v in info.extra.audios:
+            if v['bandwidth'] <= qn:
+                continue
+            audio_url = v['baseUrl']
+            qn = v['bandwidth']
+
+        res = http_utils.get(url=video_url, header=download_headers)
+        if http_utils.is_error(res):
+            return HttpResponseServerError(str(res))
+        vfile = store.save(vtype, res, "tmp_" + index, ".mp4")
+        res.close()
+
+        res = http_utils.get(url=audio_url, header=download_headers)
+        if http_utils.is_error(res):
+            return HttpResponseServerError(str(res))
+        afile = store.save(vtype, res, "tmp_" + index, ".aac")
+        res.close()
+
+        output = make_path(vtype.value, info.filename)
+        tools.ffmpeg.concat(vfile, afile, output)
+
+        os.remove(vfile)
+        os.remove(afile)
+
 
 if __name__ == '__main__':
-    BiliBiliService.fetch('https://www.bilibili.com/video/BV17s411P7oi?p=5&share_source=copy_web')
-    BiliBiliService.fetch('https://www.bilibili.com/video/BV1oK41157Gm?share_source=copy_web')
+    # BiliBiliService.fetch('https://www.bilibili.com/video/BV17s411P7oi?p=5&share_source=copy_web')
+    BiliBiliService.fetch('https://www.bilibili.com/video/BV1k24y1N7iu/')
 
 
