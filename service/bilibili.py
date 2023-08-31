@@ -173,107 +173,12 @@ class BiliBiliService(Service):
         return json.loads(data[0])
 
     @classmethod
-    def fetch(cls, url: str, mode=0) -> Result:
-        res = http_utils.get(url, header=user_headers)
-        result = re.findall(r'(?<=<script>window.__playinfo__=).*(?=</script><script>)', res.text)
-        data = json.loads(result[0])
-
-        videos, audios = [], []
-        try:
-            videos = [video['baseUrl'] for video in data['data']['dash']['video']]
-            audios = [audio['baseUrl'] for audio in data['data']['dash']['audio']]
-        except (KeyError, IndexError):
-            try:
-                url = data['data']['durl'][0]['url']
-            except (KeyError, IndexError):
-                return ErrorResult.VIDEO_ADDRESS_NOT_FOUNT
-
-        result = Result.success(url)
-        result.videos = videos
-        result.audios = audios
-        return result
-
-    @classmethod
-    def fetch2(cls, url: str, mode=0) -> Result:
-        res = http_utils.get(url, header=user_headers)
-        d = re.findall(r'(?<=<script>window.__playinfo__=).*(?=</script><script>)', res.text)
-        s = json.loads(d[0])
-
-        burl = cls.get_url(url)
-        if burl is None:
-            return ErrorResult.URL_NOT_INCORRECT
-
-        bvid = cls.get_bvid(burl)
-        if bvid is None:
-            return ErrorResult.URL_NOT_INCORRECT
-
-        res = http_utils.get('https://api.bilibili.com/x/player/pagelist',
-                             param={'bvid': bvid, 'jsonp': 'jsonp'}, header=headers)
-        if http_utils.is_error(res):
-            return Result.error(res)
-
-        data = json.loads(str(res.text))
-        p = re.findall(r"(?<=p=)(\d)", url)
-        if len(p) == 0:
-            index = 0
-        else:
-            index = int(p[0]) - 1
-
-        try:
-            cid = data['data'][index]['cid']
-        except (KeyError, IndexError):
-            return ErrorResult.VIDEO_ADDRESS_NOT_FOUNT
-
-        # entropy = 'rbMCKn@KuamXWlPMoJGsKcbiJKUfkPF_8dABscJntvqhRSETg'
-        # appkey, sec = ''.join([chr(ord(i) + 2) for i in entropy[::-1]]).split(':')
-
-        # http://api.bilibili.com/x/player/playurl?cid=227539569&bvid=BV1cD4y1m7ce&qn=112&fnval=16
-        user_headers["Referer"] = "https://www.bilibili.com/video/BV1k24y1N7iu/?vd_source=d1510af6049ae3ed0ea10a6707f1ca06"
-        res = http_utils.get('http://api.bilibili.com/x/player/playurl',
-                             param={
-                                 'avid': 784013416,
-                                 'cid': cid,
-                                 'bvid': bvid,
-                                 'qn': 127,
-                                 'otype': 'json',
-                                 'fnver': 0,
-                                 'fnval': 4048,
-                                 'fourk': 1,
-                                 'gaia_source': '',
-                                 'session': '2c2c6001d63d264212881628596e54d3',
-                                 'w_rid': '5079feced341071890a0fb066ef93e66',
-                                 'wts': 1685364777,
-                            }, header=user_headers)
-        if http_utils.is_error(res):
-            return Result.error(res)
-
-        data = json.loads(res.content)
-
-        try:
-            videos = [video['baseUrl'] for video in data['data']['dash']['video']]
-            audios = [audio['baseUrl'] for audio in data['data']['dash']['audio']]
-            url = {
-                videos: videos,
-                audios: audios,
-            }
-        except (KeyError, IndexError):
-            try:
-                url = data['data']['durl'][0]['url']
-            except (KeyError, IndexError):
-                return ErrorResult.VIDEO_ADDRESS_NOT_FOUNT
-
-        result = Result.success(url)
-        # result.videos = videos
-        # result.audios = audios
-        return result
-
-    @staticmethod
-    def download_header() -> dict:
+    def download_header(cls) -> dict:
         return download_headers
 
-    @classmethod
-    def download(cls, url) -> HttpResponse:
-        return cls.proxy_download(vtype, url, download_headers, ".mp4", mode=0)
+    # @classmethod
+    # def download(cls, url) -> HttpResponse:
+    #     return cls.proxy_download(vtype, url, download_headers, ".mp4", mode=0)
 
     @classmethod
     def complex_download(cls, info: Info):
@@ -297,6 +202,9 @@ class BiliBiliService(Service):
         res = http_utils.get(url=video_url, header=download_headers)
         if http_utils.is_error(res):
             return HttpResponseServerError(str(res))
+        if len(res.content) < 1024:
+            return HttpResponseServerError("作品下载失败")
+
         vfile = store.save(vtype, res, "tmp_" + index, ".mp4")
         res.close()
 
