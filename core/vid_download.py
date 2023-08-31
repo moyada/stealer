@@ -28,6 +28,8 @@ def download(info: Info) -> HttpResponse:
         res = http_utils.get(url=info.video, header=service.download_header())
         if http_utils.is_error(res):
             return HttpResponseServerError(str(res))
+        if len(res.content) < 1024:
+            return HttpResponseServerError("作品下载失败")
         store.save_file(info.platform, res, info.filename)
         res.close()
     else:

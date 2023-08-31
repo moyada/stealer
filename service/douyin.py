@@ -117,50 +117,6 @@ class DouyinService(Service):
 
         return Result.success(info)
 
-    @classmethod
-    def fetch(cls, url: str, mode=0) -> Result:
-        url = cls.get_url(url)
-        if url is None:
-            return ErrorResult.URL_NOT_INCORRECT
-        print(url)
-        # 请求短链接，获得itemId
-        res = http_utils.get(url, header=headers)
-        if http_utils.is_error(res):
-            return Result.error(res)
-
-        try:
-            item_id = re.findall(r"(?<=(\w)/)\d+", res.url)[0]
-        except IndexError:
-            return Result.failed(res.reason)
-
-        # 组装视频长链接
-        infourl = "https://www.iesdouyin.com/web/api/v2/aweme/iteminfo/?item_ids=" + item_id + "&dytk="# + dytk
-        print(infourl)
-
-        # 请求长链接，获取play_addr
-        url_res = http_utils.get(infourl, header=headers)
-        if http_utils.is_error(url_res):
-            return Result.error(url_res)
-
-        data = json.loads(url_res.content)
-        if not data['status_code'] == 0:
-            return Result.failed(data['status_msg'])
-
-        print(data['item_list'])
-        item = data['item_list'][0]
-        if item['aweme_type'] == 4:
-            result = Result.success(DouyinService.get_video(item))
-        elif item['aweme_type'] == 2:
-            result = Result.success(DouyinService.get_image(item))
-            result.type = 1
-            result.extra = ".zip"
-        else:
-            return ErrorResult.VIDEO_ADDRESS_NOT_FOUNT
-
-        if mode == 1:
-            result.ref = res.url
-        return result
-
     @staticmethod
     def get_cover(data) -> str:
         return data['video']['cover']
@@ -189,10 +145,6 @@ class DouyinService(Service):
             url = urls[-1]
             image_urls.append(url)
         return image_urls
-
-    @classmethod
-    def download(cls, url) -> HttpResponse:
-        return cls.proxy_download(vtype, url, download_headers, ".mp4")
 
 
 if __name__ == '__main__':

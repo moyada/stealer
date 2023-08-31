@@ -177,13 +177,9 @@ class KuaishouService(Service):
 
         return image_urls
 
-    @staticmethod
-    def download_header() -> dict:
-        return download_headers
-
     @classmethod
-    def download(cls, url) -> HttpResponse:
-        return cls.proxy_download(vtype, url, download_headers, ".mp4")
+    def download_header(cls) -> dict:
+        return download_headers
 
 
 if __name__ == '__main__':

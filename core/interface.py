@@ -5,6 +5,7 @@ from typing import Optional
 
 from django.http import HttpResponse, FileResponse, HttpResponseServerError
 
+from core import config
 from core.model import Result, Info
 from tools import store, http_utils
 
@@ -54,9 +55,14 @@ class Service:
         """
         pass
 
-    @staticmethod
-    def download_header() -> dict:
-        pass
+    @classmethod
+    def download_header(cls) -> dict:
+        return {
+            "accept": "*/*",
+            "accept-encoding": "gzip, deflate, br",
+            "Upgrade-Insecure-Requests": '1',
+            "user-agent": config.user_agent
+        }
 
     @classmethod
     def download(cls, url: str) -> HttpResponse:

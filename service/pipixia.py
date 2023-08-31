@@ -127,14 +127,6 @@ class PipixiaService(Service):
         return Result.success(url)
 
     @staticmethod
-    def download_header() -> dict:
-        return download_headers
-
-    @classmethod
-    def download(cls, url) -> HttpResponse:
-        return cls.proxy_download(vtype, url, download_headers, ".mp4", mode=0)
-
-    @staticmethod
     def get_video(video: dict) -> Optional[str]:
         if video['video_download'] is not None:
             return video['video_download']['url_list'][0]['url']
