@@ -3,3 +3,4 @@ django-cors-headers>=3.5.0
 enum34>=1.1.10
 requests>=2.22.0
 future~=0.18.3
+python-ffmpeg==0.2.0
