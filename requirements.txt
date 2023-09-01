@@ -1,5 +1,5 @@
-Django>=3.0.1
-django-cors-headers>=3.5.0
+Django>=3.2.20
+django-cors-headers>=3.14.0
 enum34>=1.1.10
 requests>=2.22.0
 future~=0.18.3
