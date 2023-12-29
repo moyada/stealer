@@ -2,14 +2,14 @@ FROM python:3.8.18-slim
 
 ENV PYTHONUNBUFFERED 1
 
+RUN apt-get update && apt-get upgrade -y && apt-get install gcc && apt-get install -y ffmpeg
+
 # 更新pip
 RUN pip install --upgrade pip --index-url http://mirrors.aliyun.com/pypi/simple/ --trusted-host mirrors.aliyun.com
 
 # 工作目录
 WORKDIR /code
 ADD . /code
-
-RUN apt-get update && apt-get install -y ffmpeg
 
 # pip安装依赖包
 RUN pip install -r requirements.txt --index-url http://mirrors.aliyun.com/pypi/simple/ --trusted-host mirrors.aliyun.com
