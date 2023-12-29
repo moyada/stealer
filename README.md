@@ -1,3 +1,8 @@
+.. image:: https://img.shields.io/github/actions/workflow/status/moyada/stealer/docker-image.yml?logo=github
+    :target: https://img.shields.io/github/actions/workflow/status/moyada/stealer/docker-image.yml
+    :alt: Build status on gh-actions
+
+
 抖音、快手、皮皮虾、火山视频。。。去水印程序 
 
 > 💡出现解析失败可在 issue 中提问，并提供可用于复现的`平台信息`、`分享链接`
