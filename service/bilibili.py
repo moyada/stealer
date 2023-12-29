@@ -118,11 +118,9 @@ class BiliBiliService(Service):
     def get_info(cls, url: str) -> Result:
         burl = cls.get_url(url)
         if burl is None:
-            print('error')
             return ErrorResult.URL_NOT_INCORRECT
 
         video_data = BiliBiliService.get_data(burl)
-
         bvid = video_data['bvid']
 
         res = http_utils.get('https://api.bilibili.com/x/player/pagelist',
@@ -144,7 +142,7 @@ class BiliBiliService(Service):
             return ErrorResult.VIDEO_ADDRESS_NOT_FOUNT
 
         res = http_utils.get(url, header=user_headers)
-        result = re.findall(r'(?<=<script>window.__playinfo__=).*(?=</script><script>)', res.text)
+        result = re.findall(r'(?<=<script>window.__playinfo__=).*(?=</script><script>window.__INITIAL_STATE__={)', res.text)
         data = json.loads(result[0])
 
         extra = None
@@ -223,6 +221,6 @@ class BiliBiliService(Service):
 
 if __name__ == '__main__':
     # BiliBiliService.fetch('https://www.bilibili.com/video/BV17s411P7oi?p=5&share_source=copy_web')
-    BiliBiliService.fetch('https://www.bilibili.com/video/BV1k24y1N7iu/')
+    BiliBiliService.get_info('https://www.bilibili.com/video/BV1ic411C7zu/')
 
 
