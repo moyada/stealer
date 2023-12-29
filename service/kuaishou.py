@@ -99,6 +99,12 @@ class KuaishouService(Service):
         parsed_url = urlparse(redirect_url)
         params_dict = parse_qs(parsed_url.query)
 
+        ids = params_dict.get("photoId")
+        if ids is None:
+            photo_id = re.findall(r'(?<=short-video/)\w+', redirect_url)[0]
+        else:
+            photo_id = ids[0]
+
         ck = '; '.join([f"{key}={value}" for key, value in res.cookies.items()])
         headers = {
             "Accept": "*/*",
@@ -127,7 +133,7 @@ class KuaishouService(Service):
             "subBiz": "BROWSE_SLIDE_PHOTO",
             "env": "SHARE_VIEWER_ENV_TX_TRICK",
             "h5Domain": "v.m.chenzhongtech.com",
-            "photoId": params_dict.get("photoId")[0],
+            "photoId": photo_id,
             "isLongVideo": False,
         }
 
@@ -183,7 +189,6 @@ class KuaishouService(Service):
 
 
 if __name__ == '__main__':
-    KuaishouService.fetch('https://www.kuaishou.com/f/X-xvAv7g3pLJ1qf')
-    KuaishouService.fetch('https://www.kuaishou.com/short-video/3x869ukmcuggqkg')
-    KuaishouService.fetch('https://v.kuaishou.com/BHhfRt')
+    KuaishouService.get_info('https://www.kuaishou.com/f/X-6sB0BYpvzO51Df')
+    KuaishouService.get_info('https://v.kuaishou.com/fUe3hM')
 
