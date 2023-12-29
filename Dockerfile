@@ -2,7 +2,7 @@ FROM python:3.8.18-slim
 
 ENV PYTHONUNBUFFERED 1
 
-RUN apt-get update && apt-get upgrade -y && apt-get install gcc && apt-get install -y ffmpeg
+RUN apt-get update && apt-get upgrade -y && apt-get install -y gcc && apt-get install -y ffmpeg
 
 # 更新pip
 RUN pip install --upgrade pip --index-url http://mirrors.aliyun.com/pypi/simple/ --trusted-host mirrors.aliyun.com
