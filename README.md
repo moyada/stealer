@@ -1,5 +1,6 @@
-[!Docker workflow](https://img.shields.io/github/actions/workflow/status/moyada/stealer/docker-image.yml?logo=github)
+# Sealer
 
+[![Docker workflow](https://img.shields.io/github/actions/workflow/status/moyada/stealer/docker-image.yml?logo=github)](https://img.shields.io/github/actions/workflow/status/moyada/stealer/docker-image.yml)
 
 抖音、快手、皮皮虾、火山视频。。。去水印程序 
 
