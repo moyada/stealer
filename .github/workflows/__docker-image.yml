@@ -1,0 +1,34 @@
+name: Docker Image CI
+
+on:
+
+  #是否展示手动点击按钮
+  workflow_dispatch:
+  # push 自动触发
+  push:
+    branches: [ master ]
+#   pull_request:
+#     branches: [ master ]
+  #定时执行
+#   schedule:
+#     - cron: 15 1 * * *
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    
+    - uses: actions/checkout@v3
+    
+    - name: Build the Docker image
+      run: docker build . --file Dockerfile --tag xueyikang/stealer
+      
+    - name: login docker hub
+      run: docker login -u xueyikang -p ${{ secrets.CREDENTIAL }}
+      
+    - name: Push the Docker image
+      run: docker push  xueyikang/stealer
+      
