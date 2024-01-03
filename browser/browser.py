@@ -72,9 +72,9 @@ def new_page() -> PageContext:
     return PageContext(pw)
 
 
-def get() -> Browser | None:
-    with sync_playwright() as p:
-        b = p.chromium.launch(headless=True)
-        return b
-    return None
+# def get() -> Browser | None:
+#     with sync_playwright() as p:
+#         b = p.chromium.launch(headless=True)
+#         return b
+#     return None
 
