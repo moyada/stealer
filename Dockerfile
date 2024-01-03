@@ -14,7 +14,7 @@ ADD . /app
 # pip安装依赖包
 RUN pip install -r requirements.txt --index-url http://mirrors.aliyun.com/pypi/simple/ --trusted-host mirrors.aliyun.com
 
-playwright install chromium
+RUN playwright install chromium
 
 # 打开容器的8000端口
 EXPOSE 8000
