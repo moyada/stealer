@@ -8,11 +8,13 @@ RUN apt-get update && apt-get upgrade -y && apt-get install -y gcc && apt-get in
 RUN pip install --upgrade pip --index-url http://mirrors.aliyun.com/pypi/simple/ --trusted-host mirrors.aliyun.com
 
 # 工作目录
-WORKDIR /code
-ADD . /code
+WORKDIR /app
+ADD . /app
 
 # pip安装依赖包
 RUN pip install -r requirements.txt --index-url http://mirrors.aliyun.com/pypi/simple/ --trusted-host mirrors.aliyun.com
+
+playwright install chromium
 
 # 打开容器的8000端口
 EXPOSE 8000

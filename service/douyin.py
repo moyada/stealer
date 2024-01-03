@@ -5,6 +5,7 @@ from urllib import parse
 
 from django.http import HttpResponse
 
+from browser.douyin import DouyinHandler
 from core.interface import Service
 from core.model import Result, ErrorResult, Info
 from tools import http_utils
@@ -70,6 +71,32 @@ class DouyinService(Service):
         if share_url is None:
             return ErrorResult.URL_NOT_INCORRECT
 
+        handler = DouyinHandler()
+        info = handler.get_info(share_url)
+        if info is None or info['status_code'] != 0:
+            return ErrorResult.VIDEO_ADDRESS_NOT_FOUNT
+
+        data = info['aweme_detail']
+
+        info = Info(platform=vtype)
+        info.desc = DouyinService.get_desc(data)
+        info.cover = DouyinService.get_cover(data)
+
+        if data['aweme_type'] == 0:
+            info.video = DouyinService.get_video(data)
+            info.filename = data['aweme_id'] + ".mp4"
+        else:
+            info.images = DouyinService.get_image(data)
+            info.filename = data['aweme_id'] + ".zip"
+
+        return Result.success(info)
+
+    @classmethod
+    def get_info2(cls, url: str) -> Result:
+        share_url = cls.get_url(url)
+        if share_url is None:
+            return ErrorResult.URL_NOT_INCORRECT
+
         # 请求短链接，获得itemId
         res = http_utils.get(share_url, header=headers, redirect=True)
         if http_utils.is_error(res):
@@ -119,7 +146,7 @@ class DouyinService(Service):
 
     @staticmethod
     def get_cover(data) -> str:
-        return data['video']['cover']
+        return data['video']['cover']['url_list'][0]
 
     @staticmethod
     def get_desc(data) -> str:
@@ -127,21 +154,21 @@ class DouyinService(Service):
 
     @staticmethod
     def get_video(data) -> str:
-        br = data['video']['bitRateList']
+        br = data['video']['bit_rate']
 
         rate = 0
         url = ''
         for item in br:
-            if item['bitRate'] > rate:
-                rate = item['bitRate']
-                url = item['playApi']
-        return "https:" + url
+            if item['bit_rate'] > rate:
+                rate = item['bit_rate']
+                url = item['play_addr']['url_list'][0]
+        return url
 
     @staticmethod
     def get_image(data) -> List[str]:
         image_urls = []
         for image in data['images']:
-            urls = image['urlList']
+            urls = image['url_list']
             url = urls[-1]
             image_urls.append(url)
         return image_urls
