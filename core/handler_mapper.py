@@ -7,7 +7,6 @@ from core.type import Video
 service_mapper = {
     Video.DOUYIN: douyin.DouyinService,
     Video.KUAISHOU: kuaishou.KuaishouService,
-    Video.HUOSHAN: huoshan.HuoshanService,
     Video.XIGUA: xigua.XiguaService,
     Video.PIPIXIA: pipixia.PipixiaService,
     Video.BILIBILI: bilibili.BiliBiliService,
