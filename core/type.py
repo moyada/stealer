@@ -7,7 +7,6 @@ class Video(Enum):
     AUTO = '自动适配', 'auto', True
     DOUYIN = '抖音', 'douyin', True
     KUAISHOU = '快手', 'kuaishou', True
-    HUOSHAN = '火山小视频', 'huoshan', True
     XIGUA = ' 西瓜视频', 'xigua', False
     PIPIXIA = '皮皮虾', 'pipixia', True
     BILIBILI = '哔哩哔哩', 'bilibili', True
