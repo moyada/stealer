@@ -34,10 +34,6 @@ CORS_ORIGIN_WHITELIST = (
 CORS_ALLOW_CREDENTIALS = True  # 指明在跨域访问中，后端是否支持对cookie的操作。
 CORS_ORIGIN_ALLOW_ALL = True
 
-SECURE_SSL_REDIRECT = False
-SESSION_COOKIE_SECURE = False
-CSRF_COOKIE_SECURE = False
-
 CORS_ALLOW_METHODS = (
     'DELETE',
     'GET',
@@ -104,7 +100,7 @@ TEMPLATES = [
     },
 ]
 
-BASE_LOG_DIR = BASE_DIR
+BASE_LOG_DIR = os.path.join(BASE_DIR, 'logs')
 
 LOGGING = {
     'version': 1,  # 保留字
@@ -135,7 +131,7 @@ LOGGING = {
     'handlers': {
         # 在终端打印
         'console': {
-            'level': 'DEBUG',
+            'level': 'INFO',
             'filters': ['require_debug_true'],  # 只有在Django debug为True时才在屏幕打印日志
             'class': 'logging.StreamHandler',  #
             'formatter': 'simple'
@@ -145,7 +141,7 @@ LOGGING = {
             'level': 'INFO',
             'class': 'logging.handlers.RotatingFileHandler',  # 保存到文件，自动切
             'filename': os.path.join(BASE_LOG_DIR, "info.log"),  # 日志文件
-            'maxBytes': 1024 * 1024 * 50,  # 日志大小 50M
+            'maxBytes': 1024 * 1024 * 10,  # 日志大小 10M
             'backupCount': 3,  # 最多备份几个
             'formatter': 'standard',
             'encoding': 'utf-8',
@@ -155,7 +151,7 @@ LOGGING = {
             'level': 'ERROR',
             'class': 'logging.handlers.RotatingFileHandler',  # 保存到文件，自动切
             'filename': os.path.join(BASE_LOG_DIR, "error.log"),  # 日志文件
-            'maxBytes': 1024 * 1024 * 20,  # 日志大小 20M
+            'maxBytes': 1024 * 1024 * 10,  # 日志大小 10M
             'backupCount': 5,
             'formatter': 'standard',
             'encoding': 'utf-8',
@@ -165,7 +161,7 @@ LOGGING = {
             'level': 'INFO',
             'class': 'logging.handlers.RotatingFileHandler',  # 保存到文件，自动切
             'filename': os.path.join(BASE_LOG_DIR, "request.log"),
-            'maxBytes': 1024 * 1024 * 20,  # 日志大小 20M
+            'maxBytes': 1024 * 1024 * 10,  # 日志大小 10M
             'backupCount': 5,
             'formatter': 'simple',
             'encoding': "utf-8"
@@ -175,7 +171,7 @@ LOGGING = {
             'level': 'INFO',
             'class': 'logging.handlers.RotatingFileHandler',  # 保存到文件，自动切
             'filename': os.path.join(BASE_LOG_DIR, "collect.log"),
-            'maxBytes': 1024 * 1024 * 50,  # 日志大小 50M
+            'maxBytes': 1024 * 1024 * 20,  # 日志大小20M
             'backupCount': 5,
             'formatter': 'collect',
             'encoding': "utf-8"
