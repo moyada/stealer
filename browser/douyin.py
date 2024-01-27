@@ -1,6 +1,7 @@
 import time
 from playwright.sync_api import Request, Response
 from browser import browser
+from core import config
 
 
 class DouyinHandler:
@@ -20,10 +21,13 @@ class DouyinHandler:
         except:
             pass
 
-        for i in range(10):
+        for i in range(0, config.page_wait, 100):
             if cls.data is not None:
                 break
-            time.sleep(0.1)
+            try:
+                p.page.wait_for_timeout(100)
+            except:
+                break
 
         p.close()
         return cls.data

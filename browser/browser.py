@@ -35,7 +35,7 @@ class PageContext:
     page = None
 
     def __init__(self, p: Playwright):
-        self.browser = p.chromium.launch(headless=True, args=args, timeout=10000)
+        self.browser = p.chromium.launch(headless=True, args=args, timeout=20000)
         self.context = self.browser.new_context()
         self.page = self.context.new_page()
 
