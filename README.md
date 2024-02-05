@@ -39,7 +39,7 @@ python3 manage.py runserver 0.0.0.0:8000
 
 [~~试用地址~~](http://127.0.0.01:8000/#/) 
 
-### Docker 方式部署
+## Docker 方式部署
 
 ```shell
 docker stop -t 300 stealer
