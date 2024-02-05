@@ -39,27 +39,3 @@ class XiguaService(Service):
     def make_url(cls, index) -> str:
         return 'https://www.ixigua.com/' + index
 
-    @classmethod
-    def fetch(cls, url: str, mode=0) -> Result:
-        url = cls.get_url(url)
-        if url is None:
-            return ErrorResult.URL_NOT_INCORRECT
-
-        # 请求短链接，获得itemId和dytk
-        res = http_utils.get(url, header=headers)
-        if http_utils.is_error(res):
-            return Result.error(res)
-
-        html = str(res.content)
-        url = re.findall(r"(?<=type=\"video\/mp4\" src=\")(.*?)(?=\")", html)[0]
-        if not url:
-            return ErrorResult.VIDEO_ADDRESS_NOT_FOUNT
-
-        result = Result.success(url)
-        if mode != 0:
-            result.ref = res.url
-        return result
-
-    @classmethod
-    def download(cls, url) -> HttpResponse:
-        return cls.proxy_download(vtype, url, download_headers, ".mp4")

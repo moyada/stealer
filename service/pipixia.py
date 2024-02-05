@@ -95,37 +95,6 @@ class PipixiaService(Service):
         info.video = url
         return Result.success(info)
 
-    @classmethod
-    def fetch(cls, url: str, mode=0) -> Result:
-        url = cls.get_url(url)
-        if url is None:
-            return ErrorResult.URL_NOT_INCORRECT
-
-        res = http_utils.get(url, header=headers)
-        if http_utils.is_error(res):
-            return Result.error(res)
-
-        try:
-            id = re.findall(r"(?<=item\/)(\d+)(?=\?)", res.url)[0]
-        except IndexError:
-            return Result.failed(res.reason)
-
-        url = "https://h5.pipix.com/bds/webapi/item/detail/?item_id=" + id + "&source=share"
-
-        info_res = http_utils.get(url, header=share_headers)
-        if http_utils.is_error(info_res):
-            return Result.error(info_res)
-
-        data = json.loads(str(info_res.text))
-
-        try:
-            video = data['data']['item']['video']
-            url = cls.get_video(video)
-        except (KeyError, IndexError):
-            return ErrorResult.VIDEO_ADDRESS_NOT_FOUNT
-
-        return Result.success(url)
-
     @staticmethod
     def get_video(video: dict) -> Optional[str]:
         if video['video_download'] is not None:

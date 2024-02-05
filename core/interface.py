@@ -64,51 +64,51 @@ class Service:
             "user-agent": config.user_agent
         }
 
-    @classmethod
-    def download(cls, url: str) -> HttpResponse:
-        """
-        下载视频
-        :param url:
-        :return:
-        """
-        result = cls.fetch(url)
-        if result.is_success():
-            name = cls.index(url) + '.mp4'
-            url = result.get_data()
-            data = json.dumps({'name': name, 'url': url})
-            return HttpResponse(data)
-        return HttpResponseServerError(result.get_data())
-
-    @classmethod
-    def proxy_download(cls, vtype, url, header: dict, extra: str, mode=1) -> HttpResponse:
-        # 检查文件
-        index = cls.index(url)
-        file, filename = store.find(vtype, index, extra)
-        if file is not None:
-            return Service.stream(file, filename)
-
-        result = cls.fetch(url, mode=mode)
-        if not result.is_success():
-            return HttpResponseServerError(result.get_data())
-
-        if mode == 1:
-            header = header.copy()
-            header['referer'] = result.ref
-
-        if result.is_image():
-            res = store.save_image(vtype, result.get_data(), index)
-            if res is not None:
-                return res
-        else:
-            res = http_utils.get(url=result.get_data(), header=header)
-            if http_utils.is_error(res):
-                return HttpResponseServerError(str(res))
-
-            store.save(vtype, res, index, result.extra)
-            res.close()
-
-        file, filename = store.find(vtype, index, result.extra)
-        return Service.stream(file, filename)
+    # @classmethod
+    # def download(cls, url: str) -> HttpResponse:
+    #     """
+    #     下载视频
+    #     :param url:
+    #     :return:
+    #     """
+    #     result = cls.fetch(url)
+    #     if result.is_success():
+    #         name = cls.index(url) + '.mp4'
+    #         url = result.get_data()
+    #         data = json.dumps({'name': name, 'url': url})
+    #         return HttpResponse(data)
+    #     return HttpResponseServerError(result.get_data())
+    #
+    # @classmethod
+    # def proxy_download(cls, vtype, url, header: dict, extra: str, mode=1) -> HttpResponse:
+    #     # 检查文件
+    #     index = cls.index(url)
+    #     file, filename = store.find(vtype, index, extra)
+    #     if file is not None:
+    #         return Service.stream(file, filename)
+    #
+    #     result = cls.fetch(url, mode=mode)
+    #     if not result.is_success():
+    #         return HttpResponseServerError(result.get_data())
+    #
+    #     if mode == 1:
+    #         header = header.copy()
+    #         header['referer'] = result.ref
+    #
+    #     if result.is_image():
+    #         res = store.save_image(vtype, result.get_data(), index)
+    #         if res is not None:
+    #             return res
+    #     else:
+    #         res = http_utils.get(url=result.get_data(), header=header)
+    #         if http_utils.is_error(res):
+    #             return HttpResponseServerError(str(res))
+    #
+    #         store.save(vtype, res, index, result.extra)
+    #         res.close()
+    #
+    #     file, filename = store.find(vtype, index, result.extra)
+    #     return Service.stream(file, filename)
 
     @classmethod
     def complex_download(cls, info: Info):

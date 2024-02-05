@@ -65,7 +65,6 @@ class BiliBiliService(Service):
 
     @classmethod
     def get_url(cls, text: str) -> Optional[str]:
-        print(text)
         if "bilibili" in text:
             urls = re.findall(r'(?<=www\.bilibili\.com\/video\/).+', text, re.I | re.M)
             if urls:
@@ -73,13 +72,11 @@ class BiliBiliService(Service):
             return None
 
         urls = re.findall(r'(?<=b23\.tv\/)\w+', text, re.I | re.M)
-        print(urls)
         if len(urls) == 0:
             return None
         url = "https://b23.tv/" + urls[0]
         res = http_utils.get(url, header=headers, redirect=False)
         url = res.headers['location']
-        print(url)
         return url
 
     # @classmethod

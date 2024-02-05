@@ -114,55 +114,6 @@ class BangumiService(Service):
         return Result.success(info)
 
     @classmethod
-    def fetch(cls, url: str, mode=0) -> Result:
-        url = cls.get_url(url)
-        if url is None:
-            return ErrorResult.URL_NOT_INCORRECT
-
-        # https://api.bilibili.com/pgc/view/web/season?ep_id=280787
-        # result > episodes > foreach > bvid
-
-        # 请求短链接，获得itemId
-        res = http_utils.get("https://api.bilibili.com/pgc/view/web/season?ep_id=280787", header=headers)
-        if http_utils.is_error(res):
-            return Result.error(res)
-
-        data = json.loads(res.content)
-
-        bvid = ""
-        cid = None
-
-        for e in data["result"]["episodes"]:
-            if e["ep_id"] == 280787:
-                bvid = e["bvid"]
-                cid = e["cid"]
-
-        # http://api.bilibili.com/x/player/playurl?cid=227539569&bvid=BV1cD4y1m7ce&qn=112&fnval=16
-        res = http_utils.get('http://api.bilibili.com/x/player/playurl',
-                             param={
-                                 'cid': cid,
-                                 'bvid': bvid,
-                                 'qn': 112,
-                                 'fnval': 0,
-                                 'fnver': 0,
-                                 'fourk': 1,
-                            }, header=user_headers)
-        if http_utils.is_error(res):
-            return Result.error(res)
-
-        data = json.loads(res.content)
-
-        try:
-            url = data['data']['durl'][0]['url']
-        except (KeyError, IndexError):
-            return ErrorResult.VIDEO_ADDRESS_NOT_FOUNT
-
-        result = Result.success(url)
-        if mode != 0:
-            result.ref = res.url
-        return result
-
-    @classmethod
     def download_header(cls) -> dict:
         return download_headers
 
