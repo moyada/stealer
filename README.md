@@ -2,31 +2,51 @@
 
 [![Docker workflow](https://img.shields.io/github/actions/workflow/status/moyada/stealer/docker-image.yml?logo=github)](https://img.shields.io/github/actions/workflow/status/moyada/stealer/docker-image.yml)
 
-抖音、快手、皮皮虾、火山视频。。。去水印程序 
+[![Docker Pulls](https://img.shields.io/docker/pulls/xueyikang/stealer.svg)](https://hub.docker.com/r/xueyikang/stealer/)
 
-> 💡出现解析失败可在 issue 中提问，并提供可用于复现的`平台信息`、`分享链接`
+抖音、快手、BiliBili、皮皮虾。。。去水印程序 
 
-项目使用 `python3` + `Vue` 开发，安装所需依赖:
+> 💡出现解析失败可在 issue 中提问，请提供可用于复现的`平台信息`、`分享链接`
 
-`pip install -r requirements.txt --index-url https://pypi.douban.com/simple`
-OR
-```shell script
-pip install Django
-pip install requests
-pip install enum34
-pip install django-cors-headers
+## 应用部署
+
+```shell
+# git clone
+git clone https://github.com/moyada/stealer
+cd stealer
+
+# install python dependencies
+pip3 install -r requirements.txt
+playwright install chromium
 ```
 
-> 配置 `core/config.py`，配置 快手cookie 与 bilibili cookie。
+### 配置 `core/config.py`，
+
+```python
+# 下载高清b站视频
+bilibili_cookie = "xxxx"
+```
+> ⚠️ 注意：下载bilibili视频会需要使用 `ffmpeg` 合成，下载耗时较久
+
+```shell
+python3 manage.py runserver 0.0.0.0:8000
+```
 
 下载解压完运行 `start.sh` 或 `run.sh`，通过浏览器打开 [localhost:8000](http://localhost:8000) 进入使用页面。
 
+- 点击`解析`获取视频信息
 - 点击`下载`直接下载视频
-- 点击`解析`获取下载地址
 
-[~~试用地址~~](http://127.0.0.01:8000/#/) 暂无空余服务器可用 
+[~~试用地址~~](http://127.0.0.01:8000/#/) 
 
 ### Docker 方式部署
 
-1. 构建镜像，拉取镜像 `docker pull xueyikang/stealer` 
-2. 启动容器，执行命令 `docker run -d -p 8000:8000 stealer`, 应用地址为：127.0.0.1:8000
+```shell
+docker stop -t 300 stealer
+docker rm -f stealer
+
+docker pull xueyikang/stealer
+
+mkdir -p stealer/logs
+docker run -d --name stealer -p 8000:8000 -v stealer/logs:/app/logs -e BILIBILI_COOKIE= --restart=always xueyikang/stealer:latest
+```
