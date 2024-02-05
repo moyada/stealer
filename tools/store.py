@@ -9,7 +9,7 @@ from django.http import HttpResponseServerError
 from requests import Response
 
 from core import config
-from tools import terminal, system, http_utils
+from tools import http_utils
 from core.type import Video
 
 logger = logging.getLogger(__name__)
@@ -72,8 +72,3 @@ def save(vtype: Video, res: Response, index: str, extra: str) -> str:
         file.close()
 
     return filename
-    # if system.is_mac():
-    #     command = 'md5 -q'
-    # else:
-    #     command = 'md5sum'
-    # logger.info(terminal.run_cmd('sh video/remd5.sh {} {}'.format(command, filename)))

@@ -82,12 +82,13 @@ class DouyinService(Service):
         info.desc = DouyinService.get_desc(data)
         info.cover = DouyinService.get_cover(data)
 
-        if data['aweme_type'] == 0:
-            info.video = DouyinService.get_video(data)
-            info.filename = data['aweme_id'] + ".mp4"
-        else:
+        # if data['aweme_type'] is not 0:
+        if data['images'] is not None :
             info.images = DouyinService.get_image(data)
             info.filename = data['aweme_id'] + ".zip"
+        else:
+            info.video = DouyinService.get_video(data)
+            info.filename = data['aweme_id'] + ".mp4"
 
         return Result.success(info)
 
