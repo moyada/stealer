@@ -1,7 +1,7 @@
 # Sealer
 
 [![Docker workflow](https://img.shields.io/github/actions/workflow/status/moyada/stealer/docker-image.yml?logo=github)](https://img.shields.io/github/actions/workflow/status/moyada/stealer/docker-image.yml)
-[![Docker Pulls](https://img.shields.io/docker/pulls/xueyikang/stealer.svg)](https://hub.docker.com/r/xueyikang/stealer/)
+[![Docker Pulls](https://img.shields.io/docker/pulls/xueyikang/stealer.svg?logo=docker)](https://hub.docker.com/r/xueyikang/stealer/)
 
 抖音、快手、BiliBili、皮皮虾。。。去水印程序 
 
