@@ -23,7 +23,7 @@ urlpatterns = [
     # path('admin/', admin.site.urls),
     path('', TemplateView.as_view(template_name="index.html"), name='index'),
     # path('', index.index, name='index'),
-    path('ip/', apis.ip, name='ip'),
+    # path('set_env', apis.set_env, name='set_env'),
     path('video/', include('core.urls'), name='video'),
 ]
 

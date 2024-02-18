@@ -3,9 +3,11 @@ from django.http import HttpResponse, HttpResponseServerError, HttpResponseBadRe
 from django.shortcuts import redirect, render
 
 import core
+from core import config
 from core.model import ErrorResult
 from route import controller
 from core.type import Video
+import core.config
 
 
 def index(request):
@@ -14,8 +16,16 @@ def index(request):
     })
 
 
-def ip(request):
-    return redirect('http://httpbin.org/ip')
+def set_env(request):
+    key = request.GET.get('key')
+    if not key:
+        return HttpResponseBadRequest(ErrorResult.TYPE_NOT_PRESENT.get_data())
+    value = request.GET.get('value')
+    if not value:
+        return HttpResponseBadRequest(ErrorResult.TYPE_NOT_PRESENT.get_data())
+
+    if key == "bilibili":
+        config.bilibili_cookie = value
 
 
 def fetch(request):

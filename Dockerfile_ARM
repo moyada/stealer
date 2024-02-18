@@ -1,0 +1,23 @@
+FROM python:3.8.18-slim
+
+ENV PYTHONUNBUFFERED 1
+
+RUN apt-get update && apt-get upgrade -y && apt-get install -y gcc && apt-get install -y ffmpeg
+
+# 更新pip
+RUN pip install --upgrade pip --index-url http://mirrors.aliyun.com/pypi/simple/ --trusted-host mirrors.aliyun.com
+
+# 工作目录
+WORKDIR /app
+ADD . /app
+
+# pip安装依赖包
+RUN pip install -r requirements.txt --index-url http://mirrors.aliyun.com/pypi/simple/ --trusted-host mirrors.aliyun.com
+
+RUN apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# 打开容器的8000端口
+EXPOSE 8000
+
+# 执行命令行,启动django服务
+CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]

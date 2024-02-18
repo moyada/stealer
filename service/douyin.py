@@ -83,7 +83,7 @@ class DouyinService(Service):
         info.cover = DouyinService.get_cover(data)
 
         # if data['aweme_type'] is not 0:
-        if data['images'] is not None :
+        if data['images'] is not None:
             info.images = DouyinService.get_image(data)
             info.filename = data['aweme_id'] + ".zip"
         else:
