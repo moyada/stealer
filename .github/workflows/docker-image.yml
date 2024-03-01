@@ -19,7 +19,6 @@ jobs:
             platform:
               - linux/amd64
               - linux/arm64
-              - linux/arm/v7
     steps:
     
     - name: Checkout
@@ -45,12 +44,3 @@ jobs:
         file: ./Dockerfile
         tags: xueyikang/stealer
         platforms: linux/amd64,linux/arm64
-
-    - name: Build and Push Docker arm image
-      uses: docker/build-push-action@v5
-      with:
-        context: .
-        push: true
-        file: ./Dockerfile_ARM
-        tags: xueyikang/stealer
-        platform: linux/arm/v7

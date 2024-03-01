@@ -30,7 +30,10 @@ class DouyinHandler:
                 break
 
         p.close()
-        return cls.data
+
+        data = cls.data
+        cls.data = None
+        return data
 
     @classmethod
     def handle_request(cls, req: Response) -> any:
