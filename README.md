@@ -46,6 +46,6 @@ docker rm -f stealer
 
 docker pull xueyikang/stealer
 
-mkdir -p stealer/logs
-docker run -d --name stealer -p 8000:8000 -v stealer/logs:/app/logs -e BILIBILI_COOKIE= --restart=always xueyikang/stealer:latest
+mkdir -p stealer-logs
+docker run -d --name stealer -p 8000:8000 -v `pwd`/stealer-logs:/app/logs -e BILIBILI_COOKIE= --restart=always xueyikang/stealer:latest
 ```
