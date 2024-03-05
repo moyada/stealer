@@ -49,3 +49,15 @@ docker pull xueyikang/stealer
 mkdir -p stealer-logs
 docker run -d --name stealer -p 8000:8000 -v `pwd`/stealer-logs:/app/logs -e BILIBILI_COOKIE= --restart=always xueyikang/stealer:latest
 ```
+
+## 使用 Docker-Compose 部署
+
+```shell
+docker-compose build
+
+# Run in Terminal
+docker-compose up
+
+# Run in background
+docker-compose up -d
+```
