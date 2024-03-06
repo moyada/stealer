@@ -21,11 +21,20 @@ def set_env(request):
     if not key:
         return HttpResponseBadRequest(ErrorResult.TYPE_NOT_PRESENT.get_data())
     value = request.GET.get('value')
+
     if not value:
-        return HttpResponseBadRequest(ErrorResult.TYPE_NOT_PRESENT.get_data())
+        v = ""
+        if key == "bilibili":
+            v = config.bilibili_cookie
+        if key == "page_wait":
+            v = config.page_wait
+        return HttpResponse(v)
 
     if key == "bilibili":
         config.bilibili_cookie = value
+    if key == "page_wait":
+        config.bilibili_cookie = value
+    return HttpResponse()
 
 
 def fetch(request):

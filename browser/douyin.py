@@ -2,6 +2,7 @@ import time
 from playwright.sync_api import Request, Response
 from browser import browser
 from core import config
+import urllib.parse
 
 
 class DouyinHandler:
@@ -29,7 +30,14 @@ class DouyinHandler:
             except:
                 break
 
+        path = get_path(p.page.url)
         p.close()
+
+        if path == "/":
+            cls.data = None
+            return None
+
+        # /note/7264601120775916855
 
         data = cls.data
         cls.data = None
@@ -53,13 +61,12 @@ class DouyinHandler:
         except:
             pass
 
-    # @classmethod
-    # def handle_request(cls, req: Request) -> any:
-    #     print(req.url)
-    #     if req.url.startswith("https://www.douyin.com/aweme/v1/web/aweme/detail/") is False:
-    #         return
-    #     print(req.url)
-    #     resp = req.response()
-    #     if resp.status != 200:
-    #         return
-    #     cls.data = resp.json()
+
+def get_path(url) -> str:
+    try:
+        result = urllib.parse.urlparse(url).path
+        if result == "":
+            return None
+        return result
+    except ValueError:
+        return None

@@ -25,6 +25,8 @@ playwright install chromium
 # 下载高清b站视频
 bilibili_cookie = "xxxx"
 ```
+或使用接口 `/env?key=bilibili&value=xxxx`
+
 > ⚠️ 注意：下载bilibili视频会需要使用 `ffmpeg` 合成，下载耗时较久
 
 ```shell
