@@ -1,0 +1,11 @@
+version: '3.8'
+
+services:
+  stealer:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - /app
+    ports:
+      - "8000:8000"
