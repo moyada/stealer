@@ -12,6 +12,10 @@ from tools import http_utils
 from core import config
 from core.type import Video
 
+import logging
+
+
+logger = logging.getLogger('request')
 
 headers = {
     "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
@@ -75,10 +79,18 @@ class DouyinService(Service):
         try:
             info = handler.get_info(share_url)
         except Exception as e:
+            logger.error(f'抖音数据获取失败: {share_url}, {e}')
             return Result.error(str(e))
 
         if info is None or info['status_code'] != 0:
+            logger.error(f'抖音数据获取失败: {share_url}, 分享链接不支持')
             return ErrorResult.VIDEO_INFO_NOT_FOUNT
+
+        if info['filter_detail'] is not None:
+            msg = info['filter_detail']['notice']
+            logger.error(f'抖音数据获取失败: {share_url}, {msg}')
+            return Result.error(msg)
+
 
         data = info['aweme_detail']
 
