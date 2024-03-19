@@ -15,4 +15,5 @@ env_bc = os.environ.get('BILIBILI_COOKIE')
 if env_bc:
     bilibili_cookie = env_bc
 
-page_wait = 5000
+os.environ['page_wait'] = "5000"
+os.environ['headless']  = "1"

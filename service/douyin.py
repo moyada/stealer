@@ -86,11 +86,10 @@ class DouyinService(Service):
             logger.error(f'抖音数据获取失败: {share_url}, 分享链接不支持')
             return ErrorResult.VIDEO_INFO_NOT_FOUNT
 
-        if info['filter_detail'] is not None:
+        if 'filter_detail' in info:
             msg = info['filter_detail']['notice']
             logger.error(f'抖音数据获取失败: {share_url}, {msg}')
             return Result.error(msg)
-
 
         data = info['aweme_detail']
 

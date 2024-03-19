@@ -1,9 +1,8 @@
 # Create your views here.
 from django.http import HttpResponse, HttpResponseServerError, HttpResponseBadRequest
 from django.shortcuts import redirect, render
-
+import os
 import core
-from core import config
 from core.model import ErrorResult
 from route import controller
 from core.type import Video
@@ -25,15 +24,19 @@ def set_env(request):
     if not value:
         v = ""
         if key == "bilibili":
-            v = config.bilibili_cookie
-        if key == "page_wait":
-            v = config.page_wait
+            v = os.environ['bilibili_cookie']
+        elif key == "page_wait":
+            v = os.environ['page_wait']
+        elif key == "headless":
+            v = os.environ['headless']
         return HttpResponse(v)
 
     if key == "bilibili":
-        config.bilibili_cookie = value
-    if key == "page_wait":
-        config.bilibili_cookie = value
+        os.environ['bilibili_cookie'] = value
+    elif key == "page_wait":
+        os.environ['page_wait'] = str(int(value))
+    elif key == "headless":
+        os.environ['headless'] = value
     return HttpResponse()
 
 

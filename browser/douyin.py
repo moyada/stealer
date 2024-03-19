@@ -1,4 +1,5 @@
 import time
+import os
 from playwright.sync_api import Request, Response
 from browser import browser
 from core import config
@@ -22,8 +23,9 @@ class DouyinHandler:
         except:
             raise Exception('网络异常，访问分享链接失败')
 
-        for i in range(0, config.page_wait, 100):
+        for i in range(0, int(os.environ['page_wait']), 100):
             if cls.data is not None:
+                timeout = False
                 break
             p.page.wait_for_timeout(100)
 
@@ -63,7 +65,7 @@ def get_path(url) -> str:
     try:
         result = urllib.parse.urlparse(url).path
         if result == "":
-            return None
+            return ""
         return result
     except ValueError:
-        return None
+        return ""

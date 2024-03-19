@@ -3,6 +3,7 @@ import threading
 
 from playwright.sync_api import sync_playwright, Browser, Playwright
 import atexit
+from core import config
 
 
 # from browser import playwright
@@ -35,7 +36,7 @@ class PageContext:
     page = None
 
     def __init__(self, p: Playwright):
-        self.browser = p.chromium.launch(headless=True, args=args, timeout=20000)
+        self.browser = p.chromium.launch(headless=os.environ['headless'] == "1", args=args, timeout=20000)
         self.context = self.browser.new_context()
         self.page = self.context.new_page()
 
