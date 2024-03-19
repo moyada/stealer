@@ -72,9 +72,13 @@ class DouyinService(Service):
             return ErrorResult.URL_NOT_INCORRECT
 
         handler = DouyinHandler()
-        info = handler.get_info(share_url)
+        try:
+            info = handler.get_info(share_url)
+        except Exception as e:
+            return Result.error(str(e))
+
         if info is None or info['status_code'] != 0:
-            return ErrorResult.VIDEO_ADDRESS_NOT_FOUNT
+            return ErrorResult.VIDEO_INFO_NOT_FOUNT
 
         data = info['aweme_detail']
 

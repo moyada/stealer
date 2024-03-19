@@ -20,22 +20,19 @@ class DouyinHandler:
             p.page.goto(url, timeout=10000)
             p.page.wait_for_timeout(2000)
         except:
-            pass
+            raise Exception('网络异常，访问分享链接失败')
 
         for i in range(0, config.page_wait, 100):
             if cls.data is not None:
                 break
-            try:
-                p.page.wait_for_timeout(100)
-            except:
-                break
+            p.page.wait_for_timeout(100)
 
         path = get_path(p.page.url)
         p.close()
 
         if path == "/":
             cls.data = None
-            return None
+            raise Exception('分享链接有误')
 
         # /note/7264601120775916855
 
