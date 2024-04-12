@@ -3,5 +3,6 @@ django-cors-headers>=3.14.0
 enum34>=1.1.10
 requests>=2.22.0
 future~=0.18.3
+chardet==5.2.0
 ffmpeg-python==0.2.0
 playwright~=1.40.0

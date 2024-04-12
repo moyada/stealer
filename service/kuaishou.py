@@ -3,7 +3,6 @@ import logging
 import re
 from typing import Optional, Union, List
 from urllib.parse import urlparse, parse_qs
-
 from django.http import HttpResponse
 from requests import Response
 
@@ -19,7 +18,7 @@ app_headers = {
     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
     "Accept-Language": "zh-CN,zh;q=0.9",
     "Accept-Encoding": "gzip, deflate, br",
-    "Host": "v.kuaishou.com",
+    "Host": "www.kuaishou.com",
     "Sec-Fetch-Dest": "document",
     "Sec-Fetch-Mode": "navigate",
     "Sec-Fetch-Site": "none",
@@ -101,48 +100,53 @@ class KuaishouService(Service):
 
         ids = params_dict.get("photoId")
         if ids is None:
-            photo_id = re.findall(r'(?<=short-video/)\w+', redirect_url)[0]
+            photo_id = re.findall(r'(?<=photo/)\w+', redirect_url)[0]
         else:
             photo_id = ids[0]
 
-        ck = '; '.join([f"{key}={value}" for key, value in res.cookies.items()])
         headers = {
             "Accept": "*/*",
-            "Accept-Encoding": "gzip, deflate, br",
+            "Accept-Encoding": "gzip, deflate",
+            "Accept-Language": "en,ja;q=0.9,zh-CN;q=0.8,zh-HK;q=0.7,zh;q=0.6",
             "content-type": "application/json",
-            "Cookie": ck,
-            "Origin": "https://v.m.chenzhongtech.com",
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            "Cookie": config.kwai_cookie,
+            "Host": "m.gifshow.com",
+            # "Origin": "https://v.m.chenzhongtech.com",
+            "Origin": "https://m.gifshow.com",
+            "Pragma": "no-cache",
             "Referer": redirect_url,
-            "Sec-Ch-Ua": config.sec_ua,
             "Sec-Fetch-Dest": "empty",
             "Sec-Fetch-Mode": "cors",
             "Sec-Fetch-Site": "same-origin",
-            "Sec-Fetch-User": "?1",
             "User-Agent": config.user_agent
         }
 
         params = {
-            "fid": params_dict.get("fid")[0],
-            "shareToken": params_dict.get("shareToken")[0],
-            "shareObjectId": params_dict.get("shareObjectId")[0],
-            "shareMethod": "TOKEN",
-            "shareId": params_dict.get("shareId")[0],
-            "shareResourceType": "PHOTO_OTHER",
-            "shareChannel": "share_copylink",
-            "kpn": "KUAISHOU",
-            "subBiz": "BROWSE_SLIDE_PHOTO",
+            # "fid": params_dict.get("fid")[0],
+            # "shareToken": params_dict.get("shareToken")[0],
+            # "shareObjectId": params_dict.get("shareObjectId")[0],
+            # "shareMethod": "TOKEN",
+            # "shareId": params_dict.get("shareId")[0],
+            # "shareResourceType": "PHOTO_OTHER",
+            # "shareChannel": "share_copylink",
+            # "kpn": "KUAISHOU",
+            # "subBiz": "BROWSE_SLIDE_PHOTO",
             "env": "SHARE_VIEWER_ENV_TX_TRICK",
-            "h5Domain": "v.m.chenzhongtech.com",
+            # "h5Domain": "v.m.chenzhongtech.com",
+            "h5Domain": "m.gifshow.com",
             "photoId": photo_id,
             "isLongVideo": False,
         }
 
-        res = http_utils.post("https://v.m.chenzhongtech.com/rest/wd/photo/info?kpn=KUAISHOU&captchaToken=", param=params, header=headers)
+        res = http_utils.post("https://m.gifshow.com/rest/wd/photo/info?kpn=undefined&captchaToken=&__NS_sig3=", param=params, header=headers)
+        # res = http_utils.post("https://v.m.chenzhongtech.com/rest/wd/photo/info?kpn=KUAISHOU&captchaToken=", param=params, header=headers)
         if http_utils.is_error(res):
             return ErrorResult.VIDEO_INFO_ERROR
 
-        data = json.loads(res.content)
 
+        data = json.loads(res.content)
         if data['result'] != 1:
             return Result.failed(data['error_msg'])
 
