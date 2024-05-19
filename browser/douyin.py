@@ -30,7 +30,6 @@ class DouyinHandler:
             p.page.wait_for_timeout(100)
 
         path = get_path(p.page.url)
-        # p.sync()
         p.close()
 
         if path == "/":
