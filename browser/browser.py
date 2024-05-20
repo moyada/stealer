@@ -4,9 +4,9 @@ import json
 from playwright.sync_api import sync_playwright, Browser, Playwright
 import atexit
 from core import config
+from tools import http_utils
 
 
-# from browser import playwright
 lock = threading.Lock()
 
 playwright_map = {
@@ -39,6 +39,16 @@ if os.path.exists(ck_path):
             cks = json.loads(data)
     except Exception as e:
             print(f"An error occurred: {e}")
+else:
+    res = http_utils.get('https://cdn.jsdelivr.net/gh/moyada/stealer@master/cookie.json', redirect=False)
+    if http_utils.is_error(res) is False:
+        try:
+            cks = json.loads(res.content)
+            with open(ck_path, 'w') as file:
+                json.dump(cks, file, indent=4)
+        except Exception as e:
+                print(f"An error occurred: {e}")
+
 
 
 class PageContext:
