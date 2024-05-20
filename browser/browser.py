@@ -40,7 +40,7 @@ if os.path.exists(ck_path):
     except Exception as e:
             print(f"An error occurred: {e}")
 else:
-    res = http_utils.get('https://cdn.jsdelivr.net/gh/moyada/stealer@master/cookie.json', redirect=False)
+    res = http_utils.get('https://cdn.jsdelivr.net/gh/moyada/stealer@master/cookie/1.0.json', redirect=False)
     if http_utils.is_error(res) is False:
         try:
             cks = json.loads(res.content)
